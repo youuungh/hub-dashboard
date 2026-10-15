@@ -1,0 +1,53 @@
+import Providers from "@/components/layout/providers";
+import { Toaster } from "@/components/ui/sonner";
+import { fontVariables } from "@/lib/font";
+import ThemeProvider from "@/components/layout/theme/theme-provider";
+import { cn } from "@/lib/utils";
+import type { Metadata, Viewport } from "next";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import "./globals.css";
+import "./theme.css";
+
+const META_THEME_COLORS = {
+  light: "#ffffff",
+  dark: "#09090b",
+};
+
+export const metadata: Metadata = {
+  title: "Hub Admin",
+  description: "Hub 플랫폼 관리자 대시보드",
+};
+
+export const viewport: Viewport = {
+  themeColor: META_THEME_COLORS.light,
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={cn("bg-background font-sans antialiased", fontVariables)}
+        suppressHydrationWarning
+      >
+        <NuqsAdapter>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            enableColorScheme
+          >
+            <Providers>
+              <Toaster />
+              {children}
+            </Providers>
+          </ThemeProvider>
+        </NuqsAdapter>
+      </body>
+    </html>
+  );
+}
