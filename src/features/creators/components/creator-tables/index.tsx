@@ -2,7 +2,7 @@
 
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar";
-import { useDataTable } from "@/hooks/use-data-table";
+import { DEFAULT_PAGE_SIZE, useDataTable } from "@/hooks/use-data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { parseAsInteger, useQueryState } from "nuqs";
 
@@ -23,7 +23,10 @@ export function CreatorTable<TData, TValue>({
   loading,
   stale,
 }: CreatorTableParams<TData, TValue>) {
-  const [pageSize] = useQueryState("perPage", parseAsInteger.withDefault(20));
+  const [pageSize] = useQueryState(
+    "perPage",
+    parseAsInteger.withDefault(DEFAULT_PAGE_SIZE),
+  );
 
   // totalPages가 없으면 직접 계산
   const pageCount = totalPages ?? Math.ceil(totalItems / pageSize);

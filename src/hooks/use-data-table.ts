@@ -40,6 +40,14 @@ const ARRAY_SEPARATOR = ",";
 const DEBOUNCE_MS = 300;
 const THROTTLE_MS = 50;
 
+export const DEFAULT_PAGE_SIZE = 20;
+
+// 표가 URL에 쓰는 선택형 필터 형식 그대로 읽는 파서
+export const selectFilterParser = parseAsArrayOf(
+  parseAsString,
+  ARRAY_SEPARATOR,
+);
+
 interface UseDataTableProps<TData>
   extends
     Omit<
@@ -118,7 +126,7 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
     PER_PAGE_KEY,
     parseAsInteger
       .withOptions(queryStateOptions)
-      .withDefault(initialState?.pagination?.pageSize ?? 10),
+      .withDefault(initialState?.pagination?.pageSize ?? DEFAULT_PAGE_SIZE),
   );
 
   const pagination: PaginationState = React.useMemo(() => {

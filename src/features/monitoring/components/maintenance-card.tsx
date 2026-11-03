@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -117,6 +117,7 @@ export function MaintenanceCard() {
                 handleConfirm();
               }}
               disabled={running}
+              className={buttonVariants({ variant: "destructive" })}
             >
               {running ? "실행 중..." : "실행"}
             </AlertDialogAction>

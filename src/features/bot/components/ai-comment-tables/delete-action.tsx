@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { deleteBotAiComment } from "@/lib/api/bot";
 import { queryKeys } from "@/lib/query-keys";
 import type { BotAiComment } from "@/types/bot";
@@ -40,11 +40,11 @@ export function DeleteAction({ data }: { data: BotAiComment }) {
     <>
       <Button
         size="sm"
-        variant="outline"
-        className="text-destructive hover:text-destructive"
+        variant="ghost"
+        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
         onClick={() => setOpen(true)}
       >
-        <Trash2 className="size-3.5" />
+        <Trash2 className="mr-1 h-4 w-4" />
         지우기
       </Button>
       <AlertDialog open={open} onOpenChange={setOpen}>
@@ -66,6 +66,7 @@ export function DeleteAction({ data }: { data: BotAiComment }) {
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={remove.isPending}
+              className={buttonVariants({ variant: "destructive" })}
               onClick={(event) => {
                 event.preventDefault();
                 remove.mutate();

@@ -2,6 +2,7 @@
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { DEFAULT_PAGE_SIZE, selectFilterParser } from "@/hooks/use-data-table";
 import { getCreatorApplications } from "@/lib/api/creators";
 import { queryKeys } from "@/lib/query-keys";
 import type { CreatorApplication } from "@/types/user";
@@ -13,9 +14,13 @@ const EMPTY: CreatorApplication[] = [];
 // 클라이언트에서 Bearer로 로드
 export default function CreatorListingPage() {
   const [page] = useQueryState("page", parseAsInteger.withDefault(1));
-  const [perPage] = useQueryState("perPage", parseAsInteger.withDefault(10));
+  const [perPage] = useQueryState(
+    "perPage",
+    parseAsInteger.withDefault(DEFAULT_PAGE_SIZE),
+  );
   const [creatorUsername] = useQueryState("creatorUsername", parseAsString);
-  const [status] = useQueryState("status", parseAsString);
+  const [statuses] = useQueryState("status", selectFilterParser);
+  const status = statuses?.[0];
   const [sort] = useQueryState("sort", parseAsString);
 
   const { data, isPending, isPlaceholderData } = useQuery({

@@ -2,6 +2,7 @@
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { parseAsInteger, useQueryState } from "nuqs";
+import { DEFAULT_PAGE_SIZE } from "@/hooks/use-data-table";
 import { getAdminPosts } from "@/lib/api/posts";
 import { queryKeys } from "@/lib/query-keys";
 import type { AdminPost } from "@/types/post";
@@ -13,7 +14,10 @@ const EMPTY: AdminPost[] = [];
 // 클라이언트에서 Bearer로 로드
 export default function PostListingPage() {
   const [page] = useQueryState("page", parseAsInteger.withDefault(1));
-  const [perPage] = useQueryState("perPage", parseAsInteger.withDefault(10));
+  const [perPage] = useQueryState(
+    "perPage",
+    parseAsInteger.withDefault(DEFAULT_PAGE_SIZE),
+  );
 
   const { data, isPending, isPlaceholderData } = useQuery({
     queryKey: [...queryKeys.posts, { page, perPage }],

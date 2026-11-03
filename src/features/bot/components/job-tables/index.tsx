@@ -1,10 +1,14 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { parseAsInteger, useQueryState } from "nuqs";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar";
-import { useDataTable } from "@/hooks/use-data-table";
+import {
+  DEFAULT_PAGE_SIZE,
+  selectFilterParser,
+  useDataTable,
+} from "@/hooks/use-data-table";
 import { getBotJobs } from "@/lib/api/bot";
 import { queryKeys } from "@/lib/query-keys";
 import type { BotJob, BotJobGroup, BotJobStatus } from "@/types/bot";
@@ -15,16 +19,21 @@ const EMPTY: BotJob[] = [];
 // 상태를 고르지 않으면 끝난 작업만 최근 순
 export function JobTable() {
   const [page] = useQueryState("page", parseAsInteger.withDefault(1));
-  const [perPage] = useQueryState("perPage", parseAsInteger.withDefault(20));
-  const [status] = useQueryState("status", parseAsString);
-  const [group] = useQueryState("group", parseAsString);
+  const [perPage] = useQueryState(
+    "perPage",
+    parseAsInteger.withDefault(DEFAULT_PAGE_SIZE),
+  );
+  const [statuses] = useQueryState("status", selectFilterParser);
+  const [groups] = useQueryState("group", selectFilterParser);
+  const status = statuses?.[0];
+  const group = groups?.[0];
 
   const { data, isPending, isPlaceholderData } = useQuery({
     queryKey: [...queryKeys.bot, "jobs", { page, perPage, status, group }],
     queryFn: () =>
       getBotJobs({
-        status: (status as BotJobStatus) || undefined,
-        group: (group as BotJobGroup) || undefined,
+        status: status as BotJobStatus | undefined,
+        group: group as BotJobGroup | undefined,
         page,
         limit: perPage,
       }),
@@ -38,7 +47,6 @@ export function JobTable() {
     columns,
     pageCount: data?.totalPages ?? 0,
     rowCount: data?.totalCount ?? 0,
-    initialState: { pagination: { pageIndex: 0, pageSize: 20 } },
     debounceMs: 500,
   });
 

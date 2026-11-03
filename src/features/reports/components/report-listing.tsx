@@ -1,7 +1,8 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { parseAsInteger, useQueryState } from "nuqs";
+import { DEFAULT_PAGE_SIZE, selectFilterParser } from "@/hooks/use-data-table";
 import { getReportedTargets } from "@/lib/api/reports";
 import { queryKeys } from "@/lib/query-keys";
 import type { ReportedTarget, ReportTargetType } from "@/types/report";
@@ -13,14 +14,18 @@ const EMPTY: ReportedTarget[] = [];
 // 클라이언트에서 Bearer로 로드
 export default function ReportListingPage() {
   const [page] = useQueryState("page", parseAsInteger.withDefault(1));
-  const [perPage] = useQueryState("perPage", parseAsInteger.withDefault(10));
-  const [targetType] = useQueryState("targetType", parseAsString);
+  const [perPage] = useQueryState(
+    "perPage",
+    parseAsInteger.withDefault(DEFAULT_PAGE_SIZE),
+  );
+  const [targetTypes] = useQueryState("targetType", selectFilterParser);
+  const targetType = targetTypes?.[0];
 
   const { data, isPending, isPlaceholderData } = useQuery({
     queryKey: [...queryKeys.reports, { page, perPage, targetType }],
     queryFn: () =>
       getReportedTargets({
-        targetType: (targetType as ReportTargetType) || undefined,
+        targetType: targetType as ReportTargetType | undefined,
         page,
         limit: perPage,
       }),

@@ -228,14 +228,6 @@ export default function OverviewPage() {
                     <CardContent className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">
-                          전체 사용자
-                        </span>
-                        <span className="font-medium">
-                          {userStats?.totalUsers.toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">
                           크리에이터
                         </span>
                         <span className="font-medium">
@@ -268,14 +260,6 @@ export default function OverviewPage() {
                       <CardTitle>주문 통계</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">
-                          전체 주문
-                        </span>
-                        <span className="font-medium">
-                          {orderStats?.totalOrders.toLocaleString()}
-                        </span>
-                      </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">
                           결제 대기

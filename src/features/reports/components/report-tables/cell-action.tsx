@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,12 +13,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { EyeOff, Eye } from "lucide-react";
 import { blindTarget, unblindTarget } from "@/lib/api/reports";
 import { getApiErrorMessage } from "@/lib/api/client";
@@ -44,14 +39,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   // 사용자는 블라인드 불가, 신고 누적만 확인
   if (data.targetType === "USER") {
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="text-muted-foreground text-xs">—</span>
-          </TooltipTrigger>
-          <TooltipContent>사용자는 블라인드 대상이 아닙니다</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <span className="text-muted-foreground text-xs">블라인드 대상 아님</span>
     );
   }
 
@@ -118,6 +106,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 handleConfirm();
               }}
               disabled={actionLoading}
+              className={cn(
+                !data.isBlinded && buttonVariants({ variant: "destructive" }),
+              )}
             >
               {actionLoading ? "처리 중..." : label}
             </AlertDialogAction>

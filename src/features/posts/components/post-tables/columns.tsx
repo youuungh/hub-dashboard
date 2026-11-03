@@ -75,21 +75,6 @@ export const columns: ColumnDef<AdminPost>[] = [
     meta: { label: "본문" },
   },
   {
-    id: "engagement",
-    header: "반응",
-    cell: ({ row }) => {
-      const { likeCount, commentCount } = row.original;
-      return (
-        <span className="text-sm tabular-nums">
-          좋아요 {likeCount.toLocaleString()} · 댓글{" "}
-          {commentCount.toLocaleString()}
-        </span>
-      );
-    },
-    enableSorting: false,
-    meta: { label: "반응" },
-  },
-  {
     accessorKey: "createdAt",
     header: "작성일",
     cell: ({ row }) => <DateCell value={row.original.createdAt} />,

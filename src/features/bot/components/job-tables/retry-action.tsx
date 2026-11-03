@@ -21,11 +21,12 @@ export function RetryAction({ id }: { id: number }) {
   return (
     <Button
       size="sm"
-      variant="outline"
+      variant="ghost"
+      className="text-primary hover:bg-primary/10 hover:text-primary"
       disabled={retry.isPending}
       onClick={() => retry.mutate()}
     >
-      <RotateCcw className="size-3.5" />
+      <RotateCcw className="mr-1 h-4 w-4" />
       다시 하기
     </Button>
   );

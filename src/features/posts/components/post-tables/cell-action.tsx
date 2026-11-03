@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -93,6 +94,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 handleConfirm();
               }}
               disabled={actionLoading}
+              className={cn(
+                !hidden && buttonVariants({ variant: "destructive" }),
+              )}
             >
               {actionLoading ? "처리 중..." : label}
             </AlertDialogAction>

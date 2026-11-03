@@ -3,7 +3,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { DataTable } from "@/components/ui/data-table/data-table";
-import { useDataTable } from "@/hooks/use-data-table";
+import { DEFAULT_PAGE_SIZE, useDataTable } from "@/hooks/use-data-table";
 import { getBotAiComments } from "@/lib/api/bot";
 import { queryKeys } from "@/lib/query-keys";
 import type { BotAiComment } from "@/types/bot";
@@ -13,7 +13,10 @@ const EMPTY: BotAiComment[] = [];
 
 export function AiCommentTable() {
   const [page] = useQueryState("page", parseAsInteger.withDefault(1));
-  const [perPage] = useQueryState("perPage", parseAsInteger.withDefault(20));
+  const [perPage] = useQueryState(
+    "perPage",
+    parseAsInteger.withDefault(DEFAULT_PAGE_SIZE),
+  );
 
   const { data, isPending, isPlaceholderData } = useQuery({
     queryKey: [...queryKeys.bot, "ai-comments", { page, perPage }],
@@ -27,7 +30,6 @@ export function AiCommentTable() {
     columns,
     pageCount: data?.totalPages ?? 0,
     rowCount: data?.totalCount ?? 0,
-    initialState: { pagination: { pageIndex: 0, pageSize: 20 } },
   });
 
   return (

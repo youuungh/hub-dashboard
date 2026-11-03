@@ -23,7 +23,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import * as React from "react";
-import { CheckIcon } from "@radix-ui/react-icons";
+import { CheckIcon } from "lucide-react";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
@@ -145,15 +145,16 @@ export function DataTableFacetedFilter<TData, TValue>({
                     key={option.value}
                     onSelect={() => onItemSelect(option, isSelected)}
                   >
+                    {/* 메뉴 항목이 아이콘을 회색으로 덮어서 체크 색은 직접 지정 */}
                     <div
                       className={cn(
-                        "border-primary flex size-4 items-center justify-center rounded-sm border",
+                        "flex size-4 shrink-0 items-center justify-center rounded-[4px] border shadow-xs",
                         isSelected
-                          ? "bg-primary"
-                          : "opacity-50 [&_svg]:invisible",
+                          ? "border-primary bg-primary"
+                          : "border-input [&_svg]:invisible",
                       )}
                     >
-                      <CheckIcon />
+                      <CheckIcon className="text-primary-foreground size-3.5" />
                     </div>
                     {option.icon && <option.icon />}
                     <span className="truncate">{option.label}</span>

@@ -2,6 +2,7 @@
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { DEFAULT_PAGE_SIZE, selectFilterParser } from "@/hooks/use-data-table";
 import { getUsers } from "@/lib/api/users";
 import type { UserSummary } from "@/types/user";
 import { queryKeys } from "@/lib/query-keys";
@@ -13,9 +14,13 @@ const EMPTY: UserSummary[] = [];
 // 클라이언트에서 Bearer로 로드
 export default function UserListingPage() {
   const [page] = useQueryState("page", parseAsInteger.withDefault(1));
-  const [perPage] = useQueryState("perPage", parseAsInteger.withDefault(10));
+  const [perPage] = useQueryState(
+    "perPage",
+    parseAsInteger.withDefault(DEFAULT_PAGE_SIZE),
+  );
   const [username] = useQueryState("username", parseAsString);
-  const [role] = useQueryState("role", parseAsString);
+  const [roles] = useQueryState("role", selectFilterParser);
+  const role = roles?.[0];
   const [sort] = useQueryState("sort", parseAsString);
 
   const { data, isPending, isPlaceholderData } = useQuery({
