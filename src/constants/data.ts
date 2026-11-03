@@ -41,4 +41,12 @@ export const navItems: NavItem[] = [
     isActive: false,
     items: [],
   },
+  {
+    title: "자동화",
+    url: "/dashboard/bot",
+    icon: "schedule",
+    shortcut: ["a", "a"],
+    isActive: false,
+    items: [],
+  },
 ];

@@ -32,6 +32,7 @@ import {
   IconX,
   IconLayoutKanban,
   IconBrandGithub,
+  IconCalendarTime,
 } from "@tabler/icons-react";
 
 export type Icon = React.ComponentType<IconProps>;
@@ -55,6 +56,7 @@ export const Icons = {
   user2: IconUserCircle,
   media: IconPhoto,
   settings: IconSettings,
+  schedule: IconCalendarTime,
   billing: IconCreditCard,
   ellipsis: IconDotsVertical,
   add: IconPlus,

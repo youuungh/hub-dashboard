@@ -1,0 +1,36 @@
+"use client";
+
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { parseAsInteger, useQueryState } from "nuqs";
+import { DataTable } from "@/components/ui/data-table/data-table";
+import { useDataTable } from "@/hooks/use-data-table";
+import { getBotAiComments } from "@/lib/api/bot";
+import { queryKeys } from "@/lib/query-keys";
+import type { BotAiComment } from "@/types/bot";
+import { columns } from "./columns";
+
+const EMPTY: BotAiComment[] = [];
+
+export function AiCommentTable() {
+  const [page] = useQueryState("page", parseAsInteger.withDefault(1));
+  const [perPage] = useQueryState("perPage", parseAsInteger.withDefault(20));
+
+  const { data, isPending, isPlaceholderData } = useQuery({
+    queryKey: [...queryKeys.bot, "ai-comments", { page, perPage }],
+    queryFn: () => getBotAiComments({ page, limit: perPage }),
+    placeholderData: keepPreviousData,
+    meta: { errorMessage: "AI 글을 불러오는데 실패했습니다" },
+  });
+
+  const { table } = useDataTable({
+    data: data?.items ?? EMPTY,
+    columns,
+    pageCount: data?.totalPages ?? 0,
+    rowCount: data?.totalCount ?? 0,
+    initialState: { pagination: { pageIndex: 0, pageSize: 20 } },
+  });
+
+  return (
+    <DataTable table={table} loading={isPending} stale={isPlaceholderData} />
+  );
+}

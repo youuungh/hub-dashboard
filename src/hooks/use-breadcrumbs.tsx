@@ -10,6 +10,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   creators: "크리에이터 신청",
   posts: "포스트",
   reports: "신고 관리",
+  bot: "자동화",
   profile: "프로필",
   security: "보안",
 };

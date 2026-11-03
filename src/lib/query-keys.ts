@@ -13,4 +13,5 @@ export const queryKeys = {
   devices: ["devices"] as const,
   statistics: ["statistics"] as const,
   monitoring: ["monitoring"] as const,
+  bot: ["bot"] as const,
 };
