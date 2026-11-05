@@ -54,7 +54,7 @@ function SortButton({
 }
 
 // 평소엔 상위만, 검색하거나 펼치면 전부
-const TOP_COUNT = 10;
+const TOP_COUNT = 5;
 
 export function EndpointCard({ metrics }: { metrics: HttpMetrics }) {
   const [query, setQuery] = useState("");
@@ -91,7 +91,8 @@ export function EndpointCard({ metrics }: { metrics: HttpMetrics }) {
         }
       />
       <Table>
-        <TableHeader className="bg-muted/60 sticky top-0 z-10 backdrop-blur-xl backdrop-saturate-150">
+        {/* 페이지 스크롤에 붙어 따라오지 않게 고정하지 않음 */}
+        <TableHeader className="bg-thead">
           <TableRow>
             <TableHead className="pl-4">엔드포인트</TableHead>
             <TableHead className="w-28 text-right">

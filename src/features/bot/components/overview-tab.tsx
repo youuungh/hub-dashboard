@@ -368,11 +368,12 @@ function UpcomingCard({ summary }: { summary?: BotSummary }) {
         }
       />
       {rows.length === 0 && <Empty>예정된 작업이 없습니다</Empty>}
-      <div className="divide-y">
+      {/* 옆 차트 높이까지 줄이 남는 높이를 나눠 가짐 */}
+      <div className="flex flex-1 flex-col divide-y">
         {rows.map((row, index) => (
           <div
             key={`${row.runAt}-${index}`}
-            className="flex items-center gap-2.5 px-4 py-2"
+            className="flex flex-1 items-center gap-2.5 px-4 py-2"
           >
             <span className="w-20 shrink-0 font-semibold whitespace-nowrap tabular-nums">
               {formatShortTime(parseServerDate(row.runAt))}
@@ -442,14 +443,15 @@ export function OverviewTab({ summary }: { summary?: BotSummary }) {
         />
       </KpiStrip>
 
+      {/* 키 큰 둘을 위에, 짧은 둘을 아래에 짝지어 같은 줄 카드의 높이가 비슷하게 */}
       <div className="grid gap-3 lg:grid-cols-2">
         <DailyChart days={summary?.dailyCounts ?? []} />
-        <UsageCard summary={summary} />
+        <UpcomingCard summary={summary} />
       </div>
 
       <div className="grid gap-3 lg:grid-cols-2">
         <TodayCard summary={summary} />
-        <UpcomingCard summary={summary} />
+        <UsageCard summary={summary} />
       </div>
     </div>
   );
