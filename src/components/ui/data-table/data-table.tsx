@@ -100,7 +100,7 @@ export function DataTable<TData>({
       {/* 브라우저 기본 스크롤, 막대 자리는 늘 비워 둬서 열 폭이 흔들리지 않게 */}
       <div
         ref={boxRef}
-        className="bg-thead-gutter min-h-0 w-full flex-1 overflow-auto [scrollbar-gutter:stable]"
+        className="bg-thead-gutter scroll-below-thead min-h-0 w-full flex-1 overflow-auto [scrollbar-gutter:stable]"
       >
         <Table className="table-fixed" style={{ minWidth }}>
           <TableHeader className="bg-thead sticky top-0 z-10">

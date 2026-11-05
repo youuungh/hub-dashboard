@@ -298,6 +298,11 @@
   background-color: color-mix(in oklab, var(--foreground) 18%, transparent);
 }
 
+/* 표는 막대가 머리줄 옆까지 올라오지 않게 길을 머리줄 높이만큼 내림 */
+.scroll-below-thead::-webkit-scrollbar-track:vertical {
+  margin-top: 33px;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   border-width: 2px;
   background-color: color-mix(in oklab, var(--foreground) 32%, transparent);
