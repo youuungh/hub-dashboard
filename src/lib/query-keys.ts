@@ -1,3 +1,4 @@
+import type { LogQueryParams } from "@/types/logs";
 import type { ReportTargetType } from "@/types/report";
 
 export const queryKeys = {
@@ -13,5 +14,6 @@ export const queryKeys = {
   devices: ["devices"] as const,
   statistics: ["statistics"] as const,
   monitoring: ["monitoring"] as const,
+  logs: (params: LogQueryParams) => ["logs", params] as const,
   bot: ["bot"] as const,
 };

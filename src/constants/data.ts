@@ -22,6 +22,15 @@ export const navItems: NavItem[] = [
     items: [],
   },
   {
+    title: "로그",
+    url: "/dashboard/logs",
+    icon: "logs",
+    group: "개요",
+    isActive: false,
+    shortcut: ["l", "l"],
+    items: [],
+  },
+  {
     title: "사용자",
     url: "/dashboard/users",
     icon: "user",
