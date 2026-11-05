@@ -112,46 +112,54 @@ function StatusBar({ summary }: { summary?: BotSummary }) {
           </span>
         </div>
       </div>
-      <Meta label="마지막 실행">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span
-              className={cn(
-                "cursor-help",
-                state === "stale" && "text-destructive",
-              )}
-            >
-              {relative(minutes)}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>
-            {summary?.lastRunAt
-              ? formatJobTime(parseServerDate(summary.lastRunAt))
-              : "아직 한 번도 돌지 않았습니다"}
-          </TooltipContent>
-        </Tooltip>
-      </Meta>
-      <Meta label="일정표">
-        {summary?.scheduleVersion ? (
-          <span className="flex flex-wrap items-center gap-1.5">
-            <Badge variant="outline" className="font-mono text-xs font-normal">
-              {summary.scheduleVersion}
-            </Badge>
-            {summary.scheduleEndsAt &&
-              `${scheduleDate(summary.scheduleEndsAt)}까지`}
-            {runningOut && (
+      {/* 좁은 화면은 상태·스위치를 한 줄에, 실행·일정표는 아랫줄로 */}
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 max-sm:order-last max-sm:w-full">
+        <Meta label="마지막 실행">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span
+                className={cn(
+                  "cursor-help",
+                  state === "stale" && "text-destructive",
+                )}
+              >
+                {relative(minutes)}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>
+              {summary?.lastRunAt
+                ? formatJobTime(parseServerDate(summary.lastRunAt))
+                : "아직 한 번도 돌지 않았습니다"}
+            </TooltipContent>
+          </Tooltip>
+        </Meta>
+        <Meta label="일정표">
+          {summary?.scheduleVersion ? (
+            <span className="flex flex-wrap items-center gap-1.5">
               <Badge
                 variant="outline"
-                className="border-destructive/30 bg-destructive/10 text-destructive font-normal"
+                className="font-mono text-xs font-normal"
               >
-                {daysLeft}일 남음 · 다음 일정표 필요
+                {summary.scheduleVersion}
               </Badge>
-            )}
-          </span>
-        ) : (
-          <span className="text-destructive">없음 · 일정표를 올려 주세요</span>
-        )}
-      </Meta>
+              {summary.scheduleEndsAt &&
+                `${scheduleDate(summary.scheduleEndsAt)}까지`}
+              {runningOut && (
+                <Badge
+                  variant="outline"
+                  className="border-destructive/30 bg-destructive/10 text-destructive font-normal"
+                >
+                  {daysLeft}일 남음 · 다음 일정표 필요
+                </Badge>
+              )}
+            </span>
+          ) : (
+            <span className="text-destructive">
+              없음 · 일정표를 올려 주세요
+            </span>
+          )}
+        </Meta>
+      </div>
       <label className="ml-auto flex cursor-pointer items-center gap-2 text-xs font-medium">
         {summary?.isEnabled ? "켜짐" : "꺼짐"}
         <Switch
@@ -250,7 +258,15 @@ function DailyChart({ days }: { days: BotDailyCount[] }) {
                   today ? "font-semibold" : "text-muted-foreground",
                 )}
               >
-                {today ? "오늘" : `${m}/${day} ${weekday}`}
+                {today ? (
+                  "오늘"
+                ) : (
+                  <>
+                    {m}/{day}
+                    {/* 좁으면 일곱 칸에 요일까지는 안 들어감 */}
+                    <span className="max-sm:hidden"> {weekday}</span>
+                  </>
+                )}
               </span>
             );
           })}
@@ -444,12 +460,12 @@ export function OverviewTab({ summary }: { summary?: BotSummary }) {
       </KpiStrip>
 
       {/* 키 큰 둘을 위에, 짧은 둘을 아래에 짝지어 같은 줄 카드의 높이가 비슷하게 */}
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
         <DailyChart days={summary?.dailyCounts ?? []} />
         <UpcomingCard summary={summary} />
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
         <TodayCard summary={summary} />
         <UsageCard summary={summary} />
       </div>

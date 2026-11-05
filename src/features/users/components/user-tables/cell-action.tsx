@@ -53,7 +53,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     }
   };
 
-  // CREATOR가 아니면 빈 공간
   if (data.role !== "CREATOR") {
     return <div className="w-9 h-9" />;
   }

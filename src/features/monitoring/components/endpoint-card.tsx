@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, Search } from "lucide-react";
 import { PanelHeader } from "@/components/panel-header";
 import { Card } from "@/components/ui/card";
@@ -91,19 +91,19 @@ export function EndpointCard({ metrics }: { metrics: HttpMetrics }) {
         }
       />
       <Table>
-        {/* 페이지 스크롤에 붙어 따라오지 않게 고정하지 않음 */}
         <TableHeader className="bg-thead">
           <TableRow>
             <TableHead className="pl-4">엔드포인트</TableHead>
-            <TableHead className="w-28 text-right">
+            <TableHead className="w-20 text-right sm:w-28">
               <SortButton
                 label="요청 수"
                 active={sort === "count"}
                 onClick={() => setSort("count")}
               />
             </TableHead>
-            <TableHead className="w-[28%]">비중</TableHead>
-            <TableHead className="w-28 pr-4 text-right">
+            {/* 좁은 화면은 막대를 빼고 숫자만 */}
+            <TableHead className="hidden w-[28%] sm:table-cell">비중</TableHead>
+            <TableHead className="w-20 pr-4 text-right sm:w-28">
               <SortButton
                 label="평균 응답"
                 active={sort === "avgTime"}
@@ -127,13 +127,23 @@ export function EndpointCard({ metrics }: { metrics: HttpMetrics }) {
           ) : (
             visible.map((stat) => (
               <TableRow key={stat.endpoint}>
-                <TableCell className="pl-4 font-mono text-xs">
-                  {stat.endpoint}
+                {/* 좁은 화면에서 주소가 단어 중간이 아니라 / 뒤에서 꺾이게 */}
+                <TableCell className="pl-4 font-mono text-xs whitespace-normal [overflow-wrap:anywhere]">
+                  {stat.endpoint.split("/").map((part, index) => (
+                    <Fragment key={index}>
+                      {index > 0 && (
+                        <>
+                          /<wbr />
+                        </>
+                      )}
+                      {part}
+                    </Fragment>
+                  ))}
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
                   {stat.count.toLocaleString()}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <div className="bg-muted h-1.5 overflow-hidden rounded-full">
                     <div
                       className="bg-chart-1 h-full rounded-full"

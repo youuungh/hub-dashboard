@@ -221,8 +221,8 @@ export function ScheduleTab() {
       )}
 
       {!isPending && rows.length > 0 && (
-        <div className="grid min-h-0 flex-1 overflow-auto lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)] lg:overflow-hidden">
-          <div className="bg-card min-h-0 lg:overflow-auto lg:border-r">
+        <div className="grid min-h-0 flex-1 grid-cols-1 overflow-auto lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)] lg:overflow-hidden">
+          <div className="bg-card lg:min-h-0 lg:overflow-auto lg:border-r">
             <div className="bg-thead grid grid-cols-7 border-b">
               {WEEKDAYS.map((label) => (
                 <span
@@ -292,7 +292,7 @@ export function ScheduleTab() {
           </div>
 
           {/* 머리줄은 스크롤 밖에 두고 그날 목록만 스크롤 */}
-          <section className="bg-card flex min-h-0 flex-col max-lg:border-t">
+          <section className="bg-card flex flex-col max-lg:border-t lg:min-h-0">
             <div className="flex flex-wrap items-center gap-2 border-b px-4 py-3">
               <h3 className="flex-1 font-semibold">{dayTitle(day)}</h3>
               <Badge variant="outline" className="font-normal">
@@ -304,7 +304,7 @@ export function ScheduleTab() {
                 </span>
               )}
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
               <div className="divide-y">
                 {items.length === 0 && (
                   <p className="text-muted-foreground py-10 text-center">

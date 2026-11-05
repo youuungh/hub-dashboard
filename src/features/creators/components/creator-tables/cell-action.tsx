@@ -82,7 +82,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     }
   };
 
-  // PENDING이 아니면 빈 공간
   if (data.status !== "PENDING") {
     return <div className="w-[88px] h-9" />;
   }

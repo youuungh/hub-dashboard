@@ -43,7 +43,6 @@ const profileFormSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-// 왼쪽 이름표, 오른쪽 입력칸
 const ROW =
   "grid gap-1.5 border-t px-4 py-3.5 first:border-t-0 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-start sm:gap-4";
 const ROW_LABEL = "text-[13px] font-medium sm:pt-1.5";

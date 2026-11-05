@@ -69,7 +69,7 @@
   --animate-skeleton: skeleton 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* 라이트 팔레트, 테마 클래스가 :root에 밀려 여기서 정의 */
+/* 라이트 팔레트 */
 :root {
   --radius: 0.5rem;
   --background: #fcfcfc;
@@ -144,7 +144,6 @@
   * {
     @apply border-border outline-ring/50;
   }
-  /* 크기를 따로 안 준 글자도 v2 기준 13px */
   body {
     @apply bg-background text-foreground text-sm;
   }
@@ -194,7 +193,6 @@
   animation: skeleton 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* 테이블 행 hover */
 [data-slot="table"] tbody tr {
   transition:
     background-color 150ms ease,
@@ -238,7 +236,6 @@
   }
 }
 
-/* 테이블 행 등장 */
 @keyframes row-in {
   from {
     opacity: 0;

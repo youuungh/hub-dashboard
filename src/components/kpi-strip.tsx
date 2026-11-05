@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-// 지표 카드 네 칸
 export function KpiStrip({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{children}</div>

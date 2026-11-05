@@ -132,7 +132,6 @@ export function DataTable<TData>({
             className={cn("transition-opacity", stale && "opacity-60")}
           >
             {loading ? (
-              // 조회 중에는 본문 행만 스켈레톤
               Array.from({
                 length: table.getState().pagination.pageSize,
               }).map((_, rowIndex) => (

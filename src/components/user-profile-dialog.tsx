@@ -58,7 +58,6 @@ const STATS = [
 const isVerified = (role?: UserRole) => role === "CREATOR" || role === "ADMIN";
 
 // 목록 3종이 공유하는 사용자 셀, 누르면 프로필
-// 권한·집계가 없으면 열 때 프로필 조회로 채움
 export function UserProfileCell({
   userId,
   user,

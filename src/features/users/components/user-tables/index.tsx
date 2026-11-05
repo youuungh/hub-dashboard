@@ -28,7 +28,6 @@ export function UserTable<TData, TValue>({
     parseAsInteger.withDefault(DEFAULT_PAGE_SIZE),
   );
 
-  // totalPages가 없으면 직접 계산
   const pageCount = totalPages ?? Math.ceil(totalItems / pageSize);
 
   // URL만 바꿈, 서버 이동이면 조회가 두 번
