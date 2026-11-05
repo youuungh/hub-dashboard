@@ -14,6 +14,15 @@
   background-color: color-mix(in oklab, var(--muted) 55%, var(--card));
 }
 
+/* 표 스크롤 상자, 머리줄이 못 덮는 막대 자리도 머리줄 색과 밑줄로 이어 칠함 */
+@utility bg-thead-gutter {
+  background: linear-gradient(
+    color-mix(in oklab, var(--muted) 55%, var(--card)) 0 32px,
+    var(--border) 32px 33px,
+    var(--card) 33px
+  );
+}
+
 /* 본문 기준 13px */
 @theme {
   --text-sm: 0.8125rem;
@@ -267,7 +276,7 @@
   overflow: visible;
 }
 
-/* 표·목록의 기본 스크롤바도 페이지 스크롤바처럼 얇게, 트랙·화살표 없이 */
+/* 스크롤 막대는 브라우저 기본, 가늘게 띄워 두고 올리면 굵고 진하게 */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -290,7 +299,8 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: color-mix(in oklab, var(--foreground) 30%, transparent);
+  border-width: 2px;
+  background-color: color-mix(in oklab, var(--foreground) 32%, transparent);
 }
 
 /* 위 스타일을 모르는 Firefox는 표준 속성으로 */

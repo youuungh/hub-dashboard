@@ -6,7 +6,6 @@ import {
 import * as React from "react";
 
 import { DataTablePagination } from "@/components/ui/data-table/data-table-pagination";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -98,14 +97,13 @@ export function DataTable<TData>({
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       {children}
-      <ScrollArea
+      {/* 브라우저 기본 스크롤, 막대 자리는 늘 비워 둬서 열 폭이 흔들리지 않게 */}
+      <div
         ref={boxRef}
-        className="bg-card min-h-0 w-full flex-1"
-        verticalBarClassName="top-8! h-auto"
-        horizontal
+        className="bg-thead-gutter min-h-0 w-full flex-1 overflow-auto [scrollbar-gutter:stable]"
       >
         <Table className="table-fixed" style={{ minWidth }}>
-          <TableHeader className="bg-muted/60 sticky top-0 z-10 backdrop-blur-xl backdrop-saturate-150">
+          <TableHeader className="bg-thead sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -190,7 +188,7 @@ export function DataTable<TData>({
             )}
           </TableBody>
         </Table>
-      </ScrollArea>
+      </div>
       <DataTablePagination
         table={table}
         className="bg-background shrink-0 border-t px-4 py-2 md:px-6"

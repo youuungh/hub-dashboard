@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Film, ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -305,7 +304,7 @@ export function ScheduleTab() {
                 </span>
               )}
             </div>
-            <ScrollArea className="min-h-0 flex-1">
+            <div className="min-h-0 flex-1 overflow-y-auto">
               <div className="divide-y">
                 {items.length === 0 && (
                   <p className="text-muted-foreground py-10 text-center">
@@ -380,7 +379,7 @@ export function ScheduleTab() {
                   );
                 })}
               </div>
-            </ScrollArea>
+            </div>
           </section>
         </div>
       )}
