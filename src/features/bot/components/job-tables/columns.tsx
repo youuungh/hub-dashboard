@@ -161,7 +161,8 @@ export const columns: ColumnDef<BotJob>[] = [
       );
     },
     enableSorting: false,
-    meta: { label: "사유", kind: "text" },
+    // 실패·건너뜀에만 있는 짧은 문구라 폭을 줄여 대상에 몰아줌, 긴 사유는 툴팁
+    meta: { label: "사유", kind: "text", width: 200 },
   },
   {
     id: "actions",
