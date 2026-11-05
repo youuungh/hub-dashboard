@@ -78,13 +78,13 @@ export function BotSummaryCard({
         </p>
       ) : (
         <div className="grid flex-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-          {/* 카드가 늘어나도 네 칸이 높이를 반씩 나눠 가짐 */}
+          {/* 카드가 늘어나도 네 칸이 높이를 반씩, 글자는 서버 상태 카드처럼 왼쪽 위 */}
           <div className="grid grid-cols-2 grid-rows-2 max-lg:border-b lg:border-r">
             {stats.map((stat, index) => (
               <div
                 key={stat.label}
                 className={cn(
-                  "flex flex-col justify-center px-4 py-3",
+                  "px-4 py-3",
                   index % 2 === 0 && "border-r",
                   index >= 2 && "border-t",
                 )}
@@ -103,37 +103,41 @@ export function BotSummaryCard({
               </div>
             ))}
           </div>
+          {/* 왼쪽 네 칸처럼 높이를 꽉 채우게 줄이 남는 높이를 나눠 가짐 */}
           <div className="flex min-w-0 flex-col">
-            <div className="text-muted-foreground px-4 pt-3 pb-1 text-xs">
+            {/* 위 여백을 네 칸과 같게 해서 칸 이름과 한 줄로 */}
+            <div className="text-muted-foreground border-b px-4 pt-3 pb-2 text-xs">
               다음 예정
             </div>
             {upcoming.length === 0 ? (
-              <p className="text-muted-foreground px-4 py-3">
+              <p className="text-muted-foreground flex flex-1 items-center justify-center px-4 py-3">
                 예정된 작업이 없습니다
               </p>
             ) : (
-              upcoming.map((job, index) => (
-                <div
-                  key={`${job.runAt}-${index}`}
-                  className="flex items-center gap-2.5 px-4 py-2"
-                >
-                  <span className="w-20 shrink-0 font-medium whitespace-nowrap tabular-nums">
-                    {formatShortTime(parseServerDate(job.runAt))}
-                  </span>
-                  <Badge
-                    variant="outline"
-                    className="bg-muted text-muted-foreground shrink-0 border-transparent font-normal"
+              <div className="flex flex-1 flex-col divide-y">
+                {upcoming.map((job, index) => (
+                  <div
+                    key={`${job.runAt}-${index}`}
+                    className="flex flex-1 items-center gap-2.5 px-4 py-2"
                   >
-                    {KIND_LABELS[job.kind]}
-                  </Badge>
-                  <span
-                    className="text-foreground/80 min-w-0 flex-1 truncate"
-                    title={job.target}
-                  >
-                    {job.target}
-                  </span>
-                </div>
-              ))
+                    <span className="w-20 shrink-0 font-medium whitespace-nowrap tabular-nums">
+                      {formatShortTime(parseServerDate(job.runAt))}
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className="bg-muted text-muted-foreground shrink-0 border-transparent font-normal"
+                    >
+                      {KIND_LABELS[job.kind]}
+                    </Badge>
+                    <span
+                      className="text-foreground/80 min-w-0 flex-1 truncate"
+                      title={job.target}
+                    >
+                      {job.target}
+                    </span>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>
