@@ -116,12 +116,14 @@ export function BotSummaryCard({
                   <span className="w-20 shrink-0 font-medium whitespace-nowrap tabular-nums">
                     {formatShortTime(parseServerDate(job.runAt))}
                   </span>
-                  <Badge
-                    variant="outline"
-                    className="bg-muted text-muted-foreground shrink-0 border-transparent font-normal"
-                  >
-                    {KIND_LABELS[job.kind]}
-                  </Badge>
+                  <span className="w-[5.5rem] shrink-0">
+                    <Badge
+                      variant="outline"
+                      className="bg-muted text-muted-foreground border-transparent font-normal"
+                    >
+                      {KIND_LABELS[job.kind]}
+                    </Badge>
+                  </span>
                   <span
                     className="text-foreground/80 min-w-0 flex-1 truncate"
                     title={job.target}

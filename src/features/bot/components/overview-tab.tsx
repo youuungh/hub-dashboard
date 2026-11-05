@@ -374,15 +374,18 @@ function UpcomingCard({ summary }: { summary?: BotSummary }) {
             key={`${row.runAt}-${index}`}
             className="flex items-center gap-2.5 px-4 py-2"
           >
-            <span className="w-12 shrink-0 font-semibold whitespace-nowrap tabular-nums">
+            <span className="w-20 shrink-0 font-semibold whitespace-nowrap tabular-nums">
               {formatShortTime(parseServerDate(row.runAt))}
             </span>
-            <Badge
-              variant="outline"
-              className="bg-muted text-muted-foreground shrink-0 border-transparent font-normal"
-            >
-              {KIND_LABELS[row.kind]}
-            </Badge>
+            {/* 가장 긴 종류에 맞춘 칸이라 내용이 한 줄로 시작 */}
+            <span className="w-[5.5rem] shrink-0">
+              <Badge
+                variant="outline"
+                className="bg-muted text-muted-foreground border-transparent font-normal"
+              >
+                {KIND_LABELS[row.kind]}
+              </Badge>
+            </span>
             <span
               className="text-foreground/80 min-w-0 flex-1 truncate"
               title={row.target}

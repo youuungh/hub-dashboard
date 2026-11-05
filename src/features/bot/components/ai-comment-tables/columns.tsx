@@ -62,7 +62,8 @@ export const columns: ColumnDef<BotAiComment>[] = [
       </span>
     ),
     enableSorting: false,
-    meta: { label: "포스트", kind: "entity", width: 220 },
+    // 내용과 같은 긴 글 칸이라 남는 폭을 반씩 나눔
+    meta: { label: "포스트", kind: "text" },
   },
   {
     id: "createdAt",
