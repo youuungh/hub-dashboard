@@ -30,6 +30,8 @@ export function DateCell({ value }: { value?: string | null }) {
   const startOfDay = (d: Date) =>
     new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const diffDays = Math.round((startOfDay(now) - startOfDay(date)) / 86400000);
+  // ko-KR 숫자 날짜는 "10. 23."처럼 끝에 점이 붙어 뗌
+  const short = SHORT.format(date).replace(/\.$/, "");
   const label =
     diffDays === 0
       ? "오늘"
@@ -38,8 +40,8 @@ export function DateCell({ value }: { value?: string | null }) {
         : diffDays < 7
           ? `${diffDays}일 전`
           : date.getFullYear() === now.getFullYear()
-            ? SHORT.format(date)
-            : `${date.getFullYear().toString().slice(2)}. ${SHORT.format(date)}`;
+            ? short
+            : `${date.getFullYear().toString().slice(2)}. ${short}`;
 
   return (
     <Tooltip>
