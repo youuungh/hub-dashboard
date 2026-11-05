@@ -1,7 +1,7 @@
-// 멤버십 단계 표시 이름, FREE는 표시 안 함
+// 멤버십 티어 표시 이름, 앱 멤버십 화면과 같게. FREE는 표시 안 함
 export function tierLabel(tier: string): string {
-  if (tier === "TIER1") return "1단계";
-  if (tier === "TIER2") return "2단계";
+  if (tier === "TIER1") return "Tier 1";
+  if (tier === "TIER2") return "Tier 2";
   return tier;
 }
 

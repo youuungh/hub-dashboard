@@ -69,7 +69,7 @@ export function UserProfileCell({
 }) {
   const [open, setOpen] = useState(false);
 
-  // 구독자 수는 프로필 응답에만 있어 열 때 항상 조회
+  // 열 때 프로필을 다시 받아 최신 집계로 덮어씀
   const {
     data: fetched,
     isPending,
@@ -91,7 +91,9 @@ export function UserProfileCell({
           avatarUrl: user.avatarUrl,
         });
   const name = shown.displayName || shown.username;
-  const subscribers = fetched?.subscriberCount;
+  // 사용자 목록 행엔 구독자 수가 있어 받기 전에도 칸을 바로 그림
+  const subscribers =
+    fetched?.subscriberCount ?? (complete ? user.subscriberCount : undefined);
   const stats =
     typeof subscribers === "number"
       ? [...STATS, { key: "subscriberCount", label: "구독자" } as const]
