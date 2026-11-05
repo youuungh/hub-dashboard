@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Film, ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -291,9 +292,9 @@ export function ScheduleTab() {
             </div>
           </div>
 
-          {/* 그날 목록만 따로 스크롤, 머리줄은 위에 고정 */}
-          <section className="bg-card min-h-0 overflow-y-auto max-lg:border-t">
-            <div className="bg-card/60 sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b px-4 py-3 backdrop-blur-xl backdrop-saturate-150">
+          {/* 머리줄은 스크롤 밖에 두고 그날 목록만 스크롤 */}
+          <section className="bg-card flex min-h-0 flex-col max-lg:border-t">
+            <div className="flex flex-wrap items-center gap-2 border-b px-4 py-3">
               <h3 className="flex-1 font-semibold">{dayTitle(day)}</h3>
               <Badge variant="outline" className="font-normal">
                 {items.length}건
@@ -304,80 +305,82 @@ export function ScheduleTab() {
                 </span>
               )}
             </div>
-            <div className="divide-y">
-              {items.length === 0 && (
-                <p className="text-muted-foreground py-10 text-center">
-                  이 날은 일정이 없습니다
-                </p>
-              )}
-              {items.map((row) => {
-                const state =
-                  STATE[
-                    row.status ??
-                      (row.scheduledAt < now ? "PENDING" : "WAITING")
-                  ];
-                return (
-                  <div key={row.id} className="flex gap-2.5 px-4 py-2.5">
-                    <span className="w-10 shrink-0 font-medium tabular-nums">
-                      {row.scheduledAt.slice(11, 16)}
-                    </span>
-                    <div className="flex min-w-0 flex-1 flex-col gap-1">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="font-medium">{row.creatorName}</span>
-                        <Badge
-                          variant="outline"
-                          className="bg-muted text-muted-foreground border-transparent font-normal"
-                        >
-                          {kindLabel(row)}
-                        </Badge>
-                        {row.tier && row.tier !== "FREE" && (
+            <ScrollArea className="min-h-0 flex-1">
+              <div className="divide-y">
+                {items.length === 0 && (
+                  <p className="text-muted-foreground py-10 text-center">
+                    이 날은 일정이 없습니다
+                  </p>
+                )}
+                {items.map((row) => {
+                  const state =
+                    STATE[
+                      row.status ??
+                        (row.scheduledAt < now ? "PENDING" : "WAITING")
+                    ];
+                  return (
+                    <div key={row.id} className="flex gap-2.5 px-4 py-2.5">
+                      <span className="w-10 shrink-0 font-medium tabular-nums">
+                        {row.scheduledAt.slice(11, 16)}
+                      </span>
+                      <div className="flex min-w-0 flex-1 flex-col gap-1">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="font-medium">{row.creatorName}</span>
                           <Badge
                             variant="outline"
                             className="bg-muted text-muted-foreground border-transparent font-normal"
                           >
-                            {tierLabel(row.tier)}
+                            {kindLabel(row)}
                           </Badge>
-                        )}
-                        <span className="text-muted-foreground flex items-center gap-1.5">
-                          {row.imageCount > 0 && (
-                            <span className="flex items-center gap-0.5 text-xs">
-                              <ImageIcon className="size-3.5" />
-                              {row.imageCount}
-                            </span>
-                          )}
-                          {row.hasVideo && <Film className="size-3.5" />}
-                        </span>
-                      </div>
-                      <span
-                        className="text-foreground/70 truncate"
-                        title={row.text}
-                      >
-                        {row.text}
-                      </span>
-                    </div>
-                    <span className="shrink-0 self-start">
-                      {row.error ? (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
+                          {row.tier && row.tier !== "FREE" && (
                             <Badge
                               variant="outline"
-                              className={cn("cursor-help", state.className)}
+                              className="bg-muted text-muted-foreground border-transparent font-normal"
                             >
-                              {state.label}
+                              {tierLabel(row.tier)}
                             </Badge>
-                          </TooltipTrigger>
-                          <TooltipContent>{row.error}</TooltipContent>
-                        </Tooltip>
-                      ) : (
-                        <Badge variant="outline" className={state.className}>
-                          {state.label}
-                        </Badge>
-                      )}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+                          )}
+                          <span className="text-muted-foreground flex items-center gap-1.5">
+                            {row.imageCount > 0 && (
+                              <span className="flex items-center gap-0.5 text-xs">
+                                <ImageIcon className="size-3.5" />
+                                {row.imageCount}
+                              </span>
+                            )}
+                            {row.hasVideo && <Film className="size-3.5" />}
+                          </span>
+                        </div>
+                        <span
+                          className="text-foreground/70 truncate"
+                          title={row.text}
+                        >
+                          {row.text}
+                        </span>
+                      </div>
+                      <span className="shrink-0 self-start">
+                        {row.error ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge
+                                variant="outline"
+                                className={cn("cursor-help", state.className)}
+                              >
+                                {state.label}
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>{row.error}</TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <Badge variant="outline" className={state.className}>
+                            {state.label}
+                          </Badge>
+                        )}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
           </section>
         </div>
       )}

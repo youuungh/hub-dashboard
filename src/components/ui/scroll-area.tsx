@@ -5,12 +5,14 @@ import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 import { cn } from "@/lib/utils";
 
+// 넘칠 때는 늘 보이게, 화면마다 막대가 나타났다 사라졌다 하지 않게
 function ScrollArea({
   className,
   children,
   viewportClassName,
   verticalBarClassName,
   horizontal = false,
+  type = "auto",
   ...props
 }: React.ComponentProps<typeof ScrollAreaPrimitive.Root> & {
   viewportClassName?: string;
@@ -23,6 +25,7 @@ function ScrollArea({
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
       className={cn("relative", className)}
+      type={type}
       {...props}
     >
       <ScrollAreaPrimitive.Viewport
@@ -60,9 +63,10 @@ function ScrollBar({
       )}
       {...props}
     >
+      {/* 내용 위에 떠 있어 반투명이면 밑의 표 줄이 비쳐 막대가 끊겨 보임 */}
       <ScrollAreaPrimitive.ScrollAreaThumb
         data-slot="scroll-area-thumb"
-        className="bg-foreground/[0.18] relative flex-1 rounded-full"
+        className="relative flex-1 rounded-full bg-[color-mix(in_oklab,var(--foreground)_20%,var(--background))] transition-colors hover:bg-[color-mix(in_oklab,var(--foreground)_35%,var(--background))]"
       />
     </ScrollAreaPrimitive.ScrollAreaScrollbar>
   );

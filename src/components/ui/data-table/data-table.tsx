@@ -101,7 +101,6 @@ export function DataTable<TData>({
       <ScrollArea
         ref={boxRef}
         className="bg-card min-h-0 w-full flex-1"
-        type="auto"
         verticalBarClassName="top-8! h-auto"
         horizontal
       >
