@@ -1,23 +1,40 @@
 "use client";
+import { useSyncExternalStore } from "react";
 import { useKBar } from "kbar";
 import { IconSearch } from "@tabler/icons-react";
 import { Button } from "./ui/button";
 
+const noop = () => () => {};
+// kbar 단축키는 맥이면 ⌘, 그 외 Ctrl
+const isMac = () => /Mac|iPhone|iPad/.test(navigator.platform);
+
 export default function SearchInput() {
   const { query } = useKBar();
+  const mac = useSyncExternalStore(noop, isMac, () => false);
   return (
-    <div className="w-full space-y-2">
+    <>
       <Button
-        variant="outline"
-        className="bg-card text-muted-foreground relative h-9 w-full justify-start rounded-lg text-sm font-normal shadow-none sm:pr-12 md:w-40 lg:w-64"
+        variant="ghost"
+        size="icon-sm"
+        aria-label="검색"
+        className="text-muted-foreground md:hidden"
         onClick={query.toggle}
       >
-        <IconSearch className="mr-2 h-4 w-4" />
-        검색...
-        <kbd className="bg-muted pointer-events-none absolute top-[0.3rem] right-[0.3rem] hidden h-6 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex">
-          <span className="text-xs">⌘</span>K
+        <IconSearch />
+      </Button>
+      <Button
+        variant="outline"
+        className="bg-card text-muted-foreground hidden h-7 w-[200px] justify-between md:flex gap-2.5 rounded-full pr-1.5 pl-2.5 text-xs font-normal shadow-none active:scale-100"
+        onClick={query.toggle}
+      >
+        <span className="flex items-center gap-2">
+          <IconSearch className="size-3.5" />
+          검색…
+        </span>
+        <kbd className="text-muted-foreground pointer-events-none hidden h-5 items-center px-1 font-sans text-[11px] select-none sm:flex">
+          {mac ? "⌘ K" : "Ctrl K"}
         </kbd>
       </Button>
-    </div>
+    </>
   );
 }

@@ -18,10 +18,7 @@ export default async function Page(props: PageProps) {
 
   // key 없음, 조건마다 재마운트되면 표가 깜빡임
   return (
-    <ListPageShell
-      title="크리에이터 신청"
-      description="크리에이터 신청을 검토하고 승인하거나 반려합니다."
-    >
+    <ListPageShell title="크리에이터 신청">
       <Suspense>
         <CreatorListingPage />
       </Suspense>

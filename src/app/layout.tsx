@@ -6,11 +6,10 @@ import { cn } from "@/lib/utils";
 import type { Metadata, Viewport } from "next";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
-import "./theme.css";
 
 const META_THEME_COLORS = {
-  light: "#ffffff",
-  dark: "#09090b",
+  light: "#fcfcfc",
+  dark: "#121212",
 };
 
 export const metadata: Metadata = {

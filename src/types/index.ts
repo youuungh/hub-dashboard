@@ -10,5 +10,7 @@ export interface NavItem {
   label?: string;
   description?: string;
   isActive?: boolean;
+  /** 사이드바 묶음 이름 */
+  group?: string;
   items?: NavItem[];
 }

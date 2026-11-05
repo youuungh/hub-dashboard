@@ -34,7 +34,7 @@ export function ApplicationDialog({ data }: { data: CreatorApplication }) {
     <>
       <button
         type="button"
-        className="text-muted-foreground block max-w-[280px] cursor-pointer truncate text-left text-sm transition-opacity hover:opacity-80"
+        className="text-muted-foreground block w-full cursor-pointer truncate text-left text-sm transition-opacity hover:opacity-80"
         onClick={(event) => {
           event.stopPropagation();
           setOpen(true);

@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import * as React from "react";
-import { CheckIcon, CaretSortIcon } from "@radix-ui/react-icons";
+import { CheckIcon } from "@radix-ui/react-icons";
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
@@ -47,11 +47,9 @@ export function DataTableViewOptions<TData>({
           role="combobox"
           variant="outline"
           size="sm"
-          className="ml-auto hidden h-8 lg:flex"
+          className="ml-auto hidden bg-card lg:flex"
         >
-          <Settings2 />
-          열 보기
-          <CaretSortIcon className="ml-auto opacity-50" />
+          <Settings2 />표 설정
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-44 p-0">

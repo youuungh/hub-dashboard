@@ -1,5 +1,4 @@
 import type { Table } from "@tanstack/react-table";
-import { ChevronsLeft, ChevronsRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +9,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DoubleArrowLeftIcon,
+  DoubleArrowRightIcon,
+} from "@radix-ui/react-icons";
 
 interface DataTablePaginationProps<TData> extends React.ComponentProps<"div"> {
   table: Table<TData>;
@@ -23,91 +27,87 @@ export function DataTablePagination<TData>({
   className,
   ...props
 }: DataTablePaginationProps<TData>) {
+  const { pageIndex, pageSize } = table.getState().pagination;
+  const rowCount = table.getRowCount();
+  const shown = table.getRowModel().rows.length;
+  const from = shown > 0 ? pageIndex * pageSize + 1 : 0;
+  const selected = table.getFilteredSelectedRowModel().rows.length;
+
   return (
     <div
       className={cn(
-        "flex w-full flex-col-reverse items-center justify-between gap-4 overflow-auto p-1 sm:flex-row sm:gap-8",
+        "text-muted-foreground flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs",
         className,
       )}
       {...props}
     >
-      <div className="text-muted-foreground flex-1 text-sm whitespace-nowrap">
-        {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-          <>
-            {table.getRowCount()}개 중{" "}
-            {table.getFilteredSelectedRowModel().rows.length}개 선택됨
-          </>
-        ) : (
-          <>총 {table.getRowCount()}개</>
-        )}
+      <div className="whitespace-nowrap tabular-nums">
+        {selected > 0
+          ? `${rowCount.toLocaleString()}개 중 ${selected}개 선택됨`
+          : shown > 0
+            ? `${rowCount.toLocaleString()}개 중 ${from}–${from + shown - 1}`
+            : `${rowCount.toLocaleString()}개`}
       </div>
-      <div className="flex flex-col-reverse items-center gap-4 sm:flex-row sm:gap-6 lg:gap-8">
-        <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium whitespace-nowrap">페이지당 행</p>
-          <Select
-            value={`${table.getState().pagination.pageSize}`}
-            onValueChange={(value) => {
-              table.setPageSize(Number(value));
-            }}
-          >
-            <SelectTrigger className="h-8 w-[4.5rem] [&[data-size]]:h-8">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
-            </SelectTrigger>
-            <SelectContent side="top">
-              {pageSizeOptions.map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center justify-center text-sm font-medium">
-          {table.getPageCount()}페이지 중{" "}
-          {table.getState().pagination.pageIndex + 1}
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            aria-label="첫 페이지"
-            variant="outline"
-            size="icon"
-            className="hidden size-8 lg:flex"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronsLeft />
-          </Button>
-          <Button
-            aria-label="이전 페이지"
-            variant="outline"
-            size="icon"
-            className="size-8"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeftIcon />
-          </Button>
-          <Button
-            aria-label="다음 페이지"
-            variant="outline"
-            size="icon"
-            className="size-8"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronRightIcon />
-          </Button>
-          <Button
-            aria-label="마지막 페이지"
-            variant="outline"
-            size="icon"
-            className="hidden size-8 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronsRight />
-          </Button>
-        </div>
+      <div className="flex items-center gap-1">
+        <span className="mr-1 whitespace-nowrap">페이지당</span>
+        <Select
+          value={`${pageSize}`}
+          onValueChange={(value) => {
+            table.setPageSize(Number(value));
+          }}
+        >
+          <SelectTrigger className="mr-2 h-[26px] gap-1 px-2 text-xs [&_svg]:size-3.5 [&[data-size]]:h-[26px]">
+            <SelectValue placeholder={pageSize} />
+          </SelectTrigger>
+          <SelectContent side="top">
+            {pageSizeOptions.map((size) => (
+              <SelectItem key={size} value={`${size}`}>
+                {size}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button
+          aria-label="첫 페이지"
+          variant="outline"
+          size="icon-sm"
+          className="hidden sm:inline-flex"
+          onClick={() => table.setPageIndex(0)}
+          disabled={!table.getCanPreviousPage()}
+        >
+          <DoubleArrowLeftIcon />
+        </Button>
+        <Button
+          aria-label="이전 페이지"
+          variant="outline"
+          size="icon-sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          <ChevronLeftIcon />
+        </Button>
+        <span className="text-foreground px-1.5 tabular-nums">
+          {pageIndex + 1} / {Math.max(table.getPageCount(), 1)}
+        </span>
+        <Button
+          aria-label="다음 페이지"
+          variant="outline"
+          size="icon-sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          <ChevronRightIcon />
+        </Button>
+        <Button
+          aria-label="마지막 페이지"
+          variant="outline"
+          size="icon-sm"
+          className="hidden sm:inline-flex"
+          onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+          disabled={!table.getCanNextPage()}
+        >
+          <DoubleArrowRightIcon />
+        </Button>
       </div>
     </div>
   );

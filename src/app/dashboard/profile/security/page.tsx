@@ -5,20 +5,14 @@ import { getDevices, removeDevice } from "@/lib/api/auth";
 import { useMe } from "@/hooks/use-me";
 import { queryKeys } from "@/lib/query-keys";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { PasswordResetDialog } from "@/features/profile/components/password-reset-dialog";
+import { PasswordResetCard } from "@/features/profile/components/password-reset-card";
 import type { Device } from "@/types/auth";
 import { parseServerDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Monitor, Smartphone, Tablet, X } from "lucide-react";
+import { Monitor, Smartphone, Tablet } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -35,11 +29,11 @@ import {
 const getDeviceIcon = (deviceType: string) => {
   switch (deviceType.toLowerCase()) {
     case "mobile":
-      return <Smartphone className="h-5 w-5" />;
+      return <Smartphone className="size-4" />;
     case "tablet":
-      return <Tablet className="h-5 w-5" />;
+      return <Tablet className="size-4" />;
     default:
-      return <Monitor className="h-5 w-5" />;
+      return <Monitor className="size-4" />;
   }
 };
 
@@ -160,82 +154,60 @@ export default function SecurityPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">비밀번호</CardTitle>
-          <CardDescription>
-            메일로 받은 인증 코드로 비밀번호를 변경합니다
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-sm font-medium">이메일</p>
-              <p className="text-sm text-muted-foreground">{email}</p>
-            </div>
-            <PasswordResetDialog email={email} />
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-y-4">
+      <PasswordResetCard email={email} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">활성 기기</CardTitle>
-          <CardDescription>현재 로그인된 기기를 관리합니다</CardDescription>
+      <Card className="gap-0 py-0">
+        <CardHeader className="flex flex-row items-center justify-between border-b py-3">
+          <CardTitle>활성 기기</CardTitle>
+          <Badge variant="outline" className="font-normal">
+            {devices.length}대
+          </Badge>
         </CardHeader>
-        <CardContent>
-          {devices.length === 0 ? (
-            <div className="text-center py-8 text-sm text-muted-foreground">
-              활성 기기가 없습니다
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {devices.map((device) => (
-                <div
-                  key={device.id}
-                  className="flex items-start justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
-                >
-                  <div className="flex items-start gap-3 flex-1">
-                    <div className="mt-0.5">
-                      {getDeviceIcon(device.deviceType)}
-                    </div>
-                    <div className="flex-1 space-y-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium">{device.os}</p>
-                        {device.isCurrent && (
-                          <Badge variant="secondary" className="text-xs">
-                            현재 기기
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {device.browser}
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span>
-                          {formatIpAddress(device.ipAddress, device.location)}
-                        </span>
-                        <span>•</span>
-                        <span>{formatDateTime(device.lastActive)}</span>
-                      </div>
-                    </div>
+        {devices.length === 0 ? (
+          <div className="text-muted-foreground py-8 text-center">
+            활성 기기가 없습니다
+          </div>
+        ) : (
+          <div className="divide-y">
+            {devices.map((device) => (
+              <div
+                key={device.id}
+                className="flex items-center gap-3 px-4 py-2.5"
+              >
+                <span className="bg-muted text-muted-foreground flex size-[30px] shrink-0 items-center justify-center rounded-md">
+                  {getDeviceIcon(device.deviceType)}
+                </span>
+                <div className="min-w-0 flex-1 space-y-0.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium">
+                      {device.browser} · {device.os}
+                    </p>
+                    {device.isCurrent && (
+                      <Badge variant="outline" className="font-normal">
+                        현재 기기
+                      </Badge>
+                    )}
                   </div>
-                  {!device.isCurrent && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                      onClick={() => setDeviceToRemove(device.id)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <p className="text-muted-foreground text-xs">
+                    {formatIpAddress(device.ipAddress, device.location)} ·{" "}
+                    {formatDateTime(device.lastActive)}
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
+                {!device.isCurrent && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-destructive hover:text-destructive"
+                    onClick={() => setDeviceToRemove(device.id)}
+                  >
+                    제거
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
 
       <AlertDialog

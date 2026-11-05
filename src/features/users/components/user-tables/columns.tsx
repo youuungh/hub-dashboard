@@ -21,6 +21,7 @@ interface User {
   followerCount: number;
   followingCount: number;
   postCount: number;
+  subscriberCount?: number | null;
 }
 
 export const columns: ColumnDef<User>[] = [
@@ -35,6 +36,8 @@ export const columns: ColumnDef<User>[] = [
     ),
     meta: {
       label: "사용자",
+      kind: "entity",
+      width: 200,
       placeholder: "아이디 검색...",
       variant: "text",
       icon: Text,
@@ -58,8 +61,10 @@ export const columns: ColumnDef<User>[] = [
     enableColumnFilter: true,
     meta: {
       label: "권한",
+      kind: "badge",
       variant: "select",
       options: ROLE_OPTIONS,
+      asTabs: true,
     },
   },
   {
@@ -68,11 +73,11 @@ export const columns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} title="팔로워" />
     ),
     cell: ({ row }) => (
-      <div className="text-center font-medium">
+      <div className="font-medium tabular-nums">
         {row.original.followerCount.toLocaleString()}
       </div>
     ),
-    meta: { label: "팔로워" },
+    meta: { label: "팔로워", kind: "number" },
   },
   {
     accessorKey: "followingCount",
@@ -80,23 +85,44 @@ export const columns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} title="팔로잉" />
     ),
     cell: ({ row }) => (
-      <div className="text-center font-medium">
+      <div className="font-medium tabular-nums">
         {row.original.followingCount.toLocaleString()}
       </div>
     ),
-    meta: { label: "팔로잉" },
+    meta: { label: "팔로잉", kind: "number" },
   },
   {
     accessorKey: "postCount",
     header: ({ column }: { column: Column<User, unknown> }) => (
-      <DataTableColumnHeader column={column} title="게시물" />
+      <DataTableColumnHeader column={column} title="포스트" />
     ),
     cell: ({ row }) => (
-      <div className="text-center font-medium">
+      <div className="font-medium tabular-nums">
         {row.original.postCount.toLocaleString()}
       </div>
     ),
-    meta: { label: "게시물" },
+    meta: { label: "포스트", kind: "number" },
+  },
+  {
+    // 서버 정렬이 없어 정렬 끔, 일반 유저는 비어 있음
+    accessorKey: "subscriberCount",
+    header: ({ column }: { column: Column<User, unknown> }) => (
+      <DataTableColumnHeader column={column} title="구독자" />
+    ),
+    cell: ({ row }) => {
+      const count = row.original.subscriberCount;
+      return (
+        <div className="font-medium tabular-nums">
+          {typeof count === "number" ? (
+            count.toLocaleString()
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          )}
+        </div>
+      );
+    },
+    enableSorting: false,
+    meta: { label: "구독자", kind: "number" },
   },
   {
     id: "actions",
@@ -107,6 +133,6 @@ export const columns: ColumnDef<User>[] = [
       </div>
     ),
     enableSorting: false,
-    meta: { label: "관리" },
+    meta: { label: "관리", kind: "actions" },
   },
 ];

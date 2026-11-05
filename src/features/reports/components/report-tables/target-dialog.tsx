@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserAvatar } from "@/components/user-avatar";
@@ -77,12 +83,11 @@ export function TargetDialog({ data }: { data: ReportedTarget }) {
 
       <Dialog open={open} onOpenChange={setOpen}>
         {/* 본문만 스크롤, 집계는 하단 고정 */}
-        <DialogContent className="flex max-h-[85vh] flex-col sm:max-w-md">
-          <DialogTitle>
-            신고된 {TYPE_LABELS[data.targetType]} #{data.targetId}
-          </DialogTitle>
-
-          <div className="flex flex-wrap items-center gap-1.5">
+        <DialogContent className="flex max-h-[85vh] flex-col gap-0 p-0 sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle>
+              신고된 {TYPE_LABELS[data.targetType]} #{data.targetId}
+            </DialogTitle>
             <Badge variant="outline" className="text-muted-foreground">
               신고 {data.reportCount}건
             </Badge>
@@ -101,13 +106,13 @@ export function TargetDialog({ data }: { data: ReportedTarget }) {
                 자동 블라인드 잠금
               </Badge>
             )}
-          </div>
+          </DialogHeader>
 
-          <div className="-mr-1 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
+          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-5 py-4">
             {loading && (
               <>
-                <div className="flex items-center gap-3">
-                  <Skeleton className="size-10 rounded-full" />
+                <div className="flex items-center gap-2.5">
+                  <Skeleton className="size-8 rounded-full" />
                   <div className="space-y-1.5">
                     <Skeleton className="h-4 w-24" />
                     <Skeleton className="h-3 w-32" />
@@ -126,10 +131,10 @@ export function TargetDialog({ data }: { data: ReportedTarget }) {
             {!loading && !error && detail && (
               <>
                 {author && (
-                  <div className="flex items-center gap-3">
-                    <UserAvatar src={author.avatarUrl} className="size-10" />
+                  <div className="flex items-center gap-2.5">
+                    <UserAvatar src={author.avatarUrl} className="size-8" />
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold">
+                      <p className="truncate text-[13px] font-medium">
                         {author.displayName || author.username}
                       </p>
                       <p className="text-muted-foreground truncate text-xs">
@@ -147,7 +152,7 @@ export function TargetDialog({ data }: { data: ReportedTarget }) {
                     있습니다.
                   </p>
                 ) : body ? (
-                  <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
+                  <p className="text-[13px] leading-relaxed break-words whitespace-pre-wrap">
                     {body}
                   </p>
                 ) : detail.mediaItems?.length ? null : (
@@ -171,7 +176,7 @@ export function TargetDialog({ data }: { data: ReportedTarget }) {
             (tags.length > 0 ||
               detail.likeCount != null ||
               detail.commentCount != null) && (
-              <div className="shrink-0 space-y-3 border-t pt-3">
+              <DialogFooter className="shrink-0 flex-col items-start">
                 {tags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {tags.map((tag) => (
@@ -196,7 +201,7 @@ export function TargetDialog({ data }: { data: ReportedTarget }) {
                     )}
                   </div>
                 )}
-              </div>
+              </DialogFooter>
             )}
         </DialogContent>
       </Dialog>

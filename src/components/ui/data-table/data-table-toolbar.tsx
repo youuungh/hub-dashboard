@@ -23,48 +23,100 @@ export function DataTableToolbar<TData>({
   className,
   ...props
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0;
-
   const columns = React.useMemo(
     () => table.getAllColumns().filter((column) => column.getCanFilter()),
     [table],
   );
+  const tabColumn = columns.find((column) => column.columnDef.meta?.asTabs);
+  const filterColumns = columns.filter((column) => column !== tabColumn);
+
+  // 탭은 전체 탭이 초기화 역할
+  const isFiltered = table
+    .getState()
+    .columnFilters.some((filter) => filter.id !== tabColumn?.id);
 
   const onReset = React.useCallback(() => {
-    table.resetColumnFilters();
-  }, [table]);
+    table.setColumnFilters((filters) =>
+      filters.filter((filter) => filter.id === tabColumn?.id),
+    );
+  }, [table, tabColumn]);
+
+  const filters = (
+    <>
+      {filterColumns.map((column) => (
+        <DataTableToolbarFilter key={column.id} column={column} />
+      ))}
+      {isFiltered && (
+        <Button
+          aria-label="필터 초기화"
+          variant="outline"
+          size="sm"
+          className="border-dashed"
+          onClick={onReset}
+        >
+          <Cross2Icon />
+          초기화
+        </Button>
+      )}
+    </>
+  );
+
+  // 탭은 제목 밑, 필터는 회색 띠
+  return (
+    <>
+      {tabColumn && <DataTableTabsFilter column={tabColumn} />}
+      <div
+        role="toolbar"
+        aria-orientation="horizontal"
+        className={cn(
+          "flex w-full shrink-0 flex-wrap items-center gap-2 border-y px-4 py-2 md:px-6",
+          !tabColumn && "mt-4",
+          className,
+        )}
+        {...props}
+      >
+        {filters}
+        <div className="ml-auto flex items-center gap-2">
+          {children}
+          <DataTableViewOptions table={table} />
+        </div>
+      </div>
+    </>
+  );
+}
+
+function DataTableTabsFilter<TData>({ column }: { column: Column<TData> }) {
+  const meta = column.columnDef.meta;
+  const filterValue = column.getFilterValue();
+  const selected = Array.isArray(filterValue) ? filterValue[0] : undefined;
+  const tabs = [{ label: "전체", value: undefined }, ...(meta?.options ?? [])];
 
   return (
     <div
-      role="toolbar"
-      aria-orientation="horizontal"
-      className={cn(
-        "flex w-full items-start justify-between gap-2 p-1",
-        className,
-      )}
-      {...props}
+      role="tablist"
+      aria-label={meta?.label}
+      className="flex shrink-0 items-stretch gap-5 overflow-x-auto px-4 pt-2 md:px-6"
     >
-      <div className="flex flex-1 flex-wrap items-center gap-2">
-        {columns.map((column) => (
-          <DataTableToolbarFilter key={column.id} column={column} />
-        ))}
-        {isFiltered && (
-          <Button
-            aria-label="필터 초기화"
-            variant="outline"
-            size="sm"
-            className="border-dashed"
-            onClick={onReset}
+      {tabs.map((tab) => {
+        const active = tab.value === selected;
+        return (
+          <button
+            key={tab.label}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() =>
+              column.setFilterValue(tab.value ? [tab.value] : undefined)
+            }
+            className={cn(
+              "text-muted-foreground hover:text-foreground focus-visible:outline-ring border-b-2 border-transparent px-px pt-1.5 pb-2.5 text-[13px] whitespace-nowrap transition-colors focus-visible:outline-2",
+              active && "text-foreground border-foreground font-medium",
+            )}
           >
-            <Cross2Icon />
-            초기화
-          </Button>
-        )}
-      </div>
-      <div className="flex items-center gap-2">
-        {children}
-        <DataTableViewOptions table={table} />
-      </div>
+            {tab.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -102,22 +154,24 @@ function DataTableToolbarFilter<TData>({
   switch (columnMeta.variant) {
     case "text":
       return (
-        <div className="flex items-center gap-2">
+        <div className="relative w-[260px] max-w-full">
+          <button
+            type="button"
+            aria-label="검색"
+            onClick={handleSearch}
+            className="text-muted-foreground hover:text-foreground absolute inset-y-0 left-0 flex w-7 items-center justify-center"
+          >
+            <Search className="size-3.5" />
+          </button>
           <Input
+            type="search"
             placeholder={columnMeta.placeholder ?? columnMeta.label}
+            aria-label={columnMeta.placeholder ?? columnMeta.label}
             value={inputValue}
             onChange={(event) => setInputValue(event.target.value)}
             onKeyDown={handleKeyDown}
-            className="h-8 w-40 lg:w-56"
+            className="h-[26px] pl-7 text-xs md:text-xs"
           />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSearch}
-            className="h-8"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
         </div>
       );
 
@@ -130,7 +184,10 @@ function DataTableToolbarFilter<TData>({
             placeholder={columnMeta.placeholder ?? columnMeta.label}
             value={(column.getFilterValue() as string) ?? ""}
             onChange={(event) => column.setFilterValue(event.target.value)}
-            className={cn("h-8 w-[120px]", columnMeta.unit && "pr-8")}
+            className={cn(
+              "h-[26px] w-[120px] text-xs md:text-xs",
+              columnMeta.unit && "pr-8",
+            )}
           />
           {columnMeta.unit && (
             <span className="bg-accent text-muted-foreground absolute top-0 right-0 bottom-0 flex items-center rounded-r-md px-2 text-sm">

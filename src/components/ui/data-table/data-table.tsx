@@ -1,7 +1,12 @@
-import { type Table as TanstackTable, flexRender } from "@tanstack/react-table";
-import type * as React from "react";
+import {
+  type Column,
+  type Table as TanstackTable,
+  flexRender,
+} from "@tanstack/react-table";
+import * as React from "react";
 
 import { DataTablePagination } from "@/components/ui/data-table/data-table-pagination";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -13,6 +18,42 @@ import {
 } from "@/components/ui/table";
 import { getCommonPinningStyles } from "@/lib/data-table";
 import { cn } from "@/lib/utils";
+import {
+  baseWidth,
+  isCentered,
+  stretches,
+} from "@/components/ui/data-table/column-kinds";
+
+// 화면이 좁아도 긴 글 열이 이 폭 밑으로는 안 줄고 표가 옆으로 스크롤됨
+const TEXT_MIN_WIDTH = 280;
+
+// 가운데 칸은 안쪽 flex 묶음도 가운데로
+const CENTER_CELL = "text-center [&>div]:justify-center";
+
+// 긴 글 열이 없을 때만 남는 폭을 늘어나는 열에 나눔
+function columnWidths<TData>(
+  columns: Column<TData>[],
+  boxWidth: number,
+): (number | undefined)[] {
+  const bases = columns.map(baseWidth);
+  if (bases.some((width) => width === undefined)) return bases;
+
+  const total = bases.reduce<number>((sum, width) => sum + (width ?? 0), 0);
+  const stretchTotal = columns.reduce(
+    (sum, column, index) =>
+      stretches(column) ? sum + (bases[index] ?? 0) : sum,
+    0,
+  );
+  const extra = boxWidth - total;
+  if (extra <= 0 || stretchTotal === 0) return bases;
+
+  return columns.map((column, index) => {
+    const base = bases[index] ?? 0;
+    return stretches(column)
+      ? Math.floor(base + (extra * base) / stretchTotal)
+      : base;
+  });
+}
 
 interface DataTableProps<TData> extends React.ComponentProps<"div"> {
   table: TanstackTable<TData>;
@@ -30,98 +71,134 @@ export function DataTable<TData>({
   stale = false,
   children,
 }: DataTableProps<TData>) {
+  const boxRef = React.useRef<HTMLDivElement>(null);
+  const [boxWidth, setBoxWidth] = React.useState(0);
+
+  React.useLayoutEffect(() => {
+    const box = boxRef.current;
+    if (!box) return;
+    setBoxWidth(box.clientWidth);
+    const observer = new ResizeObserver(() => setBoxWidth(box.clientWidth));
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, []);
+
+  const columns = table.getVisibleLeafColumns();
+  const widths = columnWidths(columns, boxWidth);
+  const widthOf = new Map(
+    columns.map((column, index) => [column.id, widths[index]]),
+  );
+  const fluidCount = widths.filter((width) => width === undefined).length;
+  const minWidth =
+    columns
+      .map(baseWidth)
+      .reduce<number>((sum, width) => sum + (width ?? 0), 0) +
+    fluidCount * TEXT_MIN_WIDTH;
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4">
+    <div className="flex min-h-0 flex-1 flex-col">
       {children}
-      <div className="bg-card min-h-0 flex-1 overflow-hidden rounded-xl border shadow-sm">
-        <div className="h-full w-full overflow-auto">
-          <Table>
-            <TableHeader className="bg-card/70 sticky top-0 z-10 border-b backdrop-blur-lg backdrop-saturate-180">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      style={{
-                        ...getCommonPinningStyles({ column: header.column }),
-                      }}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody
-              aria-busy={loading || stale}
-              className={cn("transition-opacity", stale && "opacity-60")}
-            >
-              {loading ? (
-                // 조회 중에는 본문 행만 스켈레톤
-                Array.from({
-                  length: table.getState().pagination.pageSize,
-                }).map((_, rowIndex) => (
-                  <TableRow key={rowIndex} className="hover:bg-transparent">
-                    {table.getVisibleLeafColumns().map((column) => (
-                      <TableCell key={column.id}>
-                        <div className="flex h-9 items-center">
-                          <Skeleton className="h-4 w-full max-w-40" />
-                        </div>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row, rowIndex) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="animate-row-in"
+      <ScrollArea
+        ref={boxRef}
+        className="bg-card min-h-0 w-full flex-1"
+        type="auto"
+        verticalBarClassName="top-8! h-auto"
+        horizontal
+      >
+        <Table className="table-fixed" style={{ minWidth }}>
+          <TableHeader className="bg-muted/60 sticky top-0 z-10 backdrop-blur-xl backdrop-saturate-150">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    className={cn(isCentered(header.column) && CENTER_CELL)}
                     style={{
-                      animationDelay: `${Math.min(rowIndex, 24) * 18}ms`,
+                      ...getCommonPinningStyles({ column: header.column }),
+                      width: widthOf.get(header.column.id),
                     }}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        style={{
-                          ...getCommonPinningStyles({ column: cell.column }),
-                        }}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
                         )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={table.getAllColumns().length}
-                    className="h-24 text-center"
-                  >
-                    결과가 없습니다
-                  </TableCell>
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody
+            aria-busy={loading || stale}
+            className={cn("transition-opacity", stale && "opacity-60")}
+          >
+            {loading ? (
+              // 조회 중에는 본문 행만 스켈레톤
+              Array.from({
+                length: table.getState().pagination.pageSize,
+              }).map((_, rowIndex) => (
+                <TableRow key={rowIndex} className="hover:bg-transparent">
+                  {columns.map((column) => (
+                    <TableCell
+                      key={column.id}
+                      className={cn(isCentered(column) && CENTER_CELL)}
+                    >
+                      <div className="flex h-8 items-center">
+                        <Skeleton className="h-4 w-full max-w-40" />
+                      </div>
+                    </TableCell>
+                  ))}
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
-      <div className="flex flex-col gap-2.5">
-        <DataTablePagination table={table} />
-        {actionBar &&
-          table.getFilteredSelectedRowModel().rows.length > 0 &&
-          actionBar}
-      </div>
+              ))
+            ) : table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row, rowIndex) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="animate-row-in"
+                  style={{
+                    animationDelay: `${Math.min(rowIndex, 24) * 18}ms`,
+                  }}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className={cn(isCentered(cell.column) && CENTER_CELL)}
+                      style={{
+                        ...getCommonPinningStyles({ column: cell.column }),
+                        width: widthOf.get(cell.column.id),
+                      }}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  결과가 없습니다
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </ScrollArea>
+      <DataTablePagination
+        table={table}
+        className="bg-background shrink-0 border-t px-4 py-2 md:px-6"
+      />
+      {actionBar &&
+        table.getFilteredSelectedRowModel().rows.length > 0 &&
+        actionBar}
     </div>
   );
 }

@@ -13,12 +13,11 @@ export const STATUS_LABELS: Record<string, string> = Object.fromEntries(
 export const getStatusBadgeColor = (status: string) => {
   switch (status) {
     case "APPROVED":
-      return "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
+      return "font-normal";
     case "REJECTED":
-      return "border-destructive/30 bg-destructive/10 text-destructive";
     case "REVOKED":
-      return "text-muted-foreground font-normal";
+      return "bg-muted text-muted-foreground border-transparent font-normal";
     default:
-      return "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400";
+      return "bg-primary text-primary-foreground border-transparent";
   }
 };

@@ -6,7 +6,10 @@ export interface EndpointStat {
 
 export interface HttpMetrics {
   avgResponseTime: number;
+  /** 4xx+5xx, 토큰 만료·없는 글도 포함 */
   errorRate: number;
+  /** 5xx만, 새 Hub부터 */
+  serverErrorRate?: number;
   totalRequests: number;
   endpointStats: EndpointStat[];
 }
@@ -31,6 +34,11 @@ export interface SystemMetrics {
   uptime: number;
   cpuUsage: number;
   processMemory: number;
+  /** 아래 넷은 새 Hub부터, 메모리 여유는 캐시 제외 */
+  memoryTotal?: number;
+  memoryAvailable?: number;
+  diskTotal?: number;
+  diskUsable?: number;
 }
 
 export interface MonitoringMetrics {

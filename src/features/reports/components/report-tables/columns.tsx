@@ -9,7 +9,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Column, ColumnDef } from "@tanstack/react-table";
-import { Lock } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { TargetDialog } from "./target-dialog";
 import { CellAction } from "./cell-action";
 import { TARGET_TYPE_OPTIONS } from "./options";
@@ -27,8 +28,10 @@ export const columns: ColumnDef<ReportedTarget>[] = [
     enableSorting: false,
     meta: {
       label: "대상",
+      kind: "entity",
       variant: "select",
       options: TARGET_TYPE_OPTIONS,
+      asTabs: true,
     },
   },
   {
@@ -42,8 +45,8 @@ export const columns: ColumnDef<ReportedTarget>[] = [
             variant="outline"
             className={
               isBlinded
-                ? "border-destructive/30 bg-destructive/10 text-destructive"
-                : "text-muted-foreground font-normal"
+                ? "bg-muted text-muted-foreground border-transparent font-normal"
+                : "font-normal"
             }
           >
             {isBlinded ? "숨김" : "공개"}
@@ -52,7 +55,13 @@ export const columns: ColumnDef<ReportedTarget>[] = [
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Lock className="text-muted-foreground h-3.5 w-3.5" />
+                  <Badge
+                    variant="outline"
+                    className="bg-muted text-muted-foreground cursor-help border-transparent font-normal"
+                  >
+                    <ShieldCheck className="size-3" />
+                    해제됨
+                  </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
                   관리자가 해제한 대상 — 자동 블라인드가 다시 적용되지 않습니다
@@ -64,7 +73,7 @@ export const columns: ColumnDef<ReportedTarget>[] = [
       );
     },
     enableSorting: false,
-    meta: { label: "상태" },
+    meta: { label: "상태", kind: "badge", width: 140 },
   },
   {
     accessorKey: "reportCount",
@@ -72,9 +81,28 @@ export const columns: ColumnDef<ReportedTarget>[] = [
     cell: ({ row }) => {
       const count = row.original.reportCount;
       const reachedThreshold = count >= AUTO_BLIND_THRESHOLD;
+      // 막대는 자동 블라인드 임계치까지의 비율
+      const meter = (
+        <span className="bg-muted h-1.5 w-24 shrink-0 overflow-hidden rounded-full">
+          <span
+            className={cn(
+              "block h-full rounded-full",
+              reachedThreshold ? "bg-destructive" : "bg-muted-foreground/40",
+            )}
+            style={{
+              width: `${Math.min(100, (count / AUTO_BLIND_THRESHOLD) * 100)}%`,
+            }}
+          />
+        </span>
+      );
 
       if (!reachedThreshold) {
-        return <span className="font-medium">{count}</span>;
+        return (
+          <div className="flex items-center gap-2.5">
+            <span className="min-w-6 font-medium tabular-nums">{count}</span>
+            {meter}
+          </div>
+        );
       }
 
       // 빨간 강조 이유는 툴팁으로
@@ -82,9 +110,12 @@ export const columns: ColumnDef<ReportedTarget>[] = [
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="cursor-help font-semibold text-destructive">
-                {count}
-              </span>
+              <div className="flex cursor-help items-center gap-2.5">
+                <span className="text-destructive min-w-6 font-semibold tabular-nums">
+                  {count}
+                </span>
+                {meter}
+              </div>
             </TooltipTrigger>
             <TooltipContent>
               자동 블라인드 임계치({AUTO_BLIND_THRESHOLD}) 도달
@@ -94,7 +125,7 @@ export const columns: ColumnDef<ReportedTarget>[] = [
       );
     },
     enableSorting: false,
-    meta: { label: "신고 수" },
+    meta: { label: "신고 수", kind: "meter" },
   },
   {
     id: "actions",
@@ -105,6 +136,6 @@ export const columns: ColumnDef<ReportedTarget>[] = [
       </div>
     ),
     enableSorting: false,
-    meta: { label: "관리" },
+    meta: { label: "관리", kind: "actions" },
   },
 ];

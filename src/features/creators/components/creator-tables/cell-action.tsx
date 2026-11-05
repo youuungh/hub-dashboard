@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Check, X } from "lucide-react";
 import {
@@ -36,6 +37,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+  const reasonRef = useRef<HTMLTextAreaElement>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const queryClient = useQueryClient();
 
@@ -110,67 +112,66 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </Button>
       </div>
 
-      <Dialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>신청 승인</DialogTitle>
-            <DialogDescription>
+      <AlertDialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>신청 승인</AlertDialogTitle>
+            <AlertDialogDescription>
               <strong>{data.username}</strong> 님의 크리에이터 신청을
               승인할까요? 승인하면 크리에이터 권한이 부여됩니다.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>취소</AlertDialogCancel>
             <Button
-              variant="outline"
-              onClick={() => setApproveDialogOpen(false)}
-              disabled={actionLoading}
-            >
-              취소
-            </Button>
-            <Button
+              size="sm"
               variant="default"
               onClick={handleApprove}
               disabled={actionLoading}
             >
               {actionLoading ? "승인 중..." : "승인"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>신청 반려</DialogTitle>
-            <DialogDescription>
+      <AlertDialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+        <AlertDialogContent
+          // 사유부터 쓰도록 취소 버튼 대신 입력칸에 포커스
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            reasonRef.current?.focus();
+          }}
+        >
+          <AlertDialogHeader>
+            <AlertDialogTitle>신청 반려</AlertDialogTitle>
+            <AlertDialogDescription>
               <strong>{data.username}</strong> 님의 크리에이터 신청을 반려할
-              사유를 입력하세요. 신청자에게 그대로 전달됩니다.
-            </DialogDescription>
-          </DialogHeader>
-          <Textarea
-            placeholder="반려 사유..."
-            value={rejectionReason}
-            onChange={(e) => setRejectionReason(e.target.value)}
-            rows={4}
-          />
-          <DialogFooter>
+              사유를 입력하세요.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="px-5 pb-4">
+            <Textarea
+              ref={reasonRef}
+              placeholder="반려 사유..."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              rows={4}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>취소</AlertDialogCancel>
             <Button
-              variant="outline"
-              onClick={() => setRejectDialogOpen(false)}
-              disabled={actionLoading}
-            >
-              취소
-            </Button>
-            <Button
+              size="sm"
               variant="destructive"
               onClick={handleRejectConfirm}
               disabled={actionLoading || !rejectionReason.trim()}
             >
               {actionLoading ? "반려 중..." : "반려"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

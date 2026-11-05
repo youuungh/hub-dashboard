@@ -29,7 +29,7 @@ export default function KBar({ children }: { children: React.ReactNode }) {
               shortcut: navItem.shortcut,
               keywords: navItem.title.toLowerCase(),
               section: "이동",
-              subtitle: `Go to ${navItem.title}`,
+              icon: navItem.icon ? navItem.icon : undefined,
               perform: () => navigateTo(navItem.url),
             }
           : null;
@@ -41,7 +41,6 @@ export default function KBar({ children }: { children: React.ReactNode }) {
           shortcut: childItem.shortcut,
           keywords: childItem.title.toLowerCase(),
           section: navItem.title,
-          subtitle: `Go to ${childItem.title}`,
           perform: () => navigateTo(childItem.url),
         })) ?? [];
 
@@ -54,7 +53,7 @@ export default function KBar({ children }: { children: React.ReactNode }) {
       shortcut: ["p"],
       keywords: "profile settings account",
       section: "계정",
-      subtitle: "프로필로 이동",
+      icon: "user",
       perform: () => navigateTo("/dashboard/profile"),
     };
 
@@ -62,7 +61,11 @@ export default function KBar({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   return (
-    <KBarProvider actions={actions}>
+    <KBarProvider
+      actions={actions}
+      // 본문 스크롤이 없어 스크롤바 자리 보정이 레이아웃만 밀어냄
+      options={{ disableScrollbarManagement: true }}
+    >
       <KBarComponent>{children}</KBarComponent>
     </KBarProvider>
   );
@@ -74,12 +77,15 @@ const KBarComponent = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <KBarPortal>
-        <KBarPositioner className="bg-background/80 fixed inset-0 z-99999 p-0! backdrop-blur-sm">
-          <KBarAnimator className="bg-card text-card-foreground relative mt-64! w-full max-w-[600px] -translate-y-12! overflow-hidden rounded-lg border shadow-lg">
-            <div className="bg-card border-border sticky top-0 z-10 border-b">
-              <KBarSearch className="bg-card w-full border-none px-4 py-2 text-sm outline-hidden focus:ring-0 focus:ring-offset-0 focus:outline-hidden" />
+        <KBarPositioner className="fixed inset-0 z-99999 bg-black/10 px-4! py-0! backdrop-blur-md">
+          <KBarAnimator className="bg-popover text-popover-foreground relative mt-40! w-full max-w-[560px] -translate-y-12! overflow-hidden rounded-lg border shadow-lg">
+            <div className="border-border sticky top-0 z-10 border-b">
+              <KBarSearch
+                defaultPlaceholder="이동할 화면이나 명령 검색…"
+                className="placeholder:text-muted-foreground w-full border-none bg-transparent px-4 py-3 text-sm outline-hidden focus:ring-0 focus:ring-offset-0 focus:outline-hidden"
+              />
             </div>
-            <div className="max-h-[400px]">
+            <div className="max-h-[400px] pb-1.5">
               <RenderResults />
             </div>
           </KBarAnimator>

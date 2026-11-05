@@ -1,11 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { MediaThumb } from "@/components/media-thumb";
 import { UserAvatar } from "@/components/user-avatar";
-import { parseServerDate } from "@/lib/format";
+import { parseServerDate, tierLabel } from "@/lib/format";
 import { splitTrailingHashtags } from "@/lib/utils";
 import { PostMediaGrid } from "@/components/post-media-grid";
 import type { AdminPost } from "@/types/post";
@@ -28,37 +34,40 @@ export function PostDialog({ data }: { data: AdminPost }) {
       {/* 본문을 누르면 포스트 정보 */}
       <button
         type="button"
-        className="flex cursor-pointer items-center gap-2 text-left transition-opacity hover:opacity-80"
+        className="flex w-full min-w-0 cursor-pointer items-center gap-3 text-left transition-opacity hover:opacity-80"
         onClick={(event) => {
           event.stopPropagation();
           setOpen(true);
         }}
       >
-        {first && <MediaThumb media={first} className="size-9" />}
-        {data.mediaItems.length > 1 && (
-          <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
-            +{data.mediaItems.length - 1}
+        {first && (
+          <span className="relative shrink-0">
+            <MediaThumb media={first} className="size-8" />
+            {data.mediaItems.length > 1 && (
+              <span className="absolute right-0.5 bottom-0.5 rounded bg-black/60 px-0.5 text-[9.5px] leading-3.5 font-semibold text-white tabular-nums">
+                +{data.mediaItems.length - 1}
+              </span>
+            )}
           </span>
         )}
-        <span className="text-muted-foreground block w-[16rem] max-w-full truncate text-sm">
+        <span className="text-foreground/80 min-w-0 truncate text-sm">
           {data.content || "—"}
         </span>
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          className="flex max-h-[85vh] flex-col sm:max-w-md"
+          className="flex max-h-[85vh] flex-col gap-0 p-0 sm:max-w-[480px]"
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
-          <DialogTitle>포스트 #{data.id}</DialogTitle>
-
-          <div className="flex flex-wrap gap-1.5">
+          <DialogHeader>
+            <DialogTitle>포스트 #{data.id}</DialogTitle>
             <Badge
               variant="outline"
               className={
                 data.isActive
-                  ? "text-muted-foreground font-normal"
-                  : "border-destructive/30 bg-destructive/10 text-destructive"
+                  ? "font-normal"
+                  : "bg-muted text-muted-foreground border-transparent font-normal"
               }
             >
               {data.isActive ? "공개" : "숨김"}
@@ -70,7 +79,7 @@ export function PostDialog({ data }: { data: AdminPost }) {
             )}
             {data.requiredTier !== "FREE" && (
               <Badge variant="outline" className="font-normal">
-                {data.requiredTier}
+                {tierLabel(data.requiredTier)}
               </Badge>
             )}
             {(data.isPinnedInFeed || data.isPinnedInCommunity) && (
@@ -78,14 +87,14 @@ export function PostDialog({ data }: { data: AdminPost }) {
                 고정됨
               </Badge>
             )}
-          </div>
+          </DialogHeader>
 
           {/* 작성자·본문·첨부만 스크롤 */}
-          <div className="-mr-1 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
-            <div className="flex items-center gap-3">
-              <UserAvatar src={data.author.avatarUrl} className="size-10" />
+          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-5 py-4">
+            <div className="flex items-center gap-2.5">
+              <UserAvatar src={data.author.avatarUrl} className="size-8" />
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold">
+                <p className="truncate text-[13px] font-medium">
                   {data.author.displayName || data.author.username}
                 </p>
                 <p className="text-muted-foreground truncate text-xs">
@@ -96,7 +105,7 @@ export function PostDialog({ data }: { data: AdminPost }) {
             </div>
 
             {body && (
-              <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
+              <p className="text-[13px] leading-relaxed break-words whitespace-pre-wrap">
                 {body}
               </p>
             )}
@@ -105,7 +114,7 @@ export function PostDialog({ data }: { data: AdminPost }) {
           </div>
 
           {/* 태그·집계는 항상 보이게 */}
-          <div className="shrink-0 space-y-3 border-t pt-3">
+          <DialogFooter className="shrink-0 flex-col items-start">
             {data.tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {data.tags.map((tag) => (
@@ -122,7 +131,7 @@ export function PostDialog({ data }: { data: AdminPost }) {
               <span>조회 {data.viewCount.toLocaleString()}</span>
               <span>공유 {data.shareCount.toLocaleString()}</span>
             </div>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>

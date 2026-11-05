@@ -95,7 +95,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
               }}
               disabled={actionLoading}
               className={cn(
-                !hidden && buttonVariants({ variant: "destructive" }),
+                !hidden &&
+                  buttonVariants({ variant: "destructive", size: "sm" }),
               )}
             >
               {actionLoading ? "처리 중..." : label}

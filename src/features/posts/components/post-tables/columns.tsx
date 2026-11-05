@@ -1,13 +1,8 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { DateCell } from "@/components/table/date-cell";
+import { tierLabel } from "@/lib/format";
 import { ColumnDef } from "@tanstack/react-table";
 import { Lock } from "lucide-react";
 import { UserProfileCell } from "@/components/user-profile-dialog";
@@ -27,7 +22,7 @@ export const columns: ColumnDef<AdminPost>[] = [
       />
     ),
     enableSorting: false,
-    meta: { label: "작성자" },
+    meta: { label: "작성자", kind: "entity" },
   },
   {
     id: "state",
@@ -40,46 +35,40 @@ export const columns: ColumnDef<AdminPost>[] = [
             variant="outline"
             className={
               isActive
-                ? "text-muted-foreground font-normal"
-                : "border-destructive/30 bg-destructive/10 text-destructive"
+                ? "font-normal"
+                : "bg-muted text-muted-foreground border-transparent font-normal"
             }
           >
             {isActive ? "공개" : "숨김"}
           </Badge>
-          {isSecret && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Lock className="text-muted-foreground h-3.5 w-3.5" />
-                </TooltipTrigger>
-                <TooltipContent>비밀글</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-          {requiredTier !== "FREE" && (
-            <Badge variant="outline" className="font-normal">
-              {requiredTier}
+          {(requiredTier !== "FREE" || isSecret) && (
+            <Badge
+              variant="outline"
+              className="bg-muted text-muted-foreground border-transparent font-normal"
+            >
+              <Lock className="size-3" />
+              {requiredTier !== "FREE" ? tierLabel(requiredTier) : "비밀글"}
             </Badge>
           )}
         </div>
       );
     },
     enableSorting: false,
-    meta: { label: "상태" },
+    meta: { label: "상태", kind: "badge", width: 140 },
   },
   {
     id: "content",
     header: "본문",
     cell: ({ row }) => <PostDialog data={row.original} />,
     enableSorting: false,
-    meta: { label: "본문" },
+    meta: { label: "본문", kind: "text" },
   },
   {
     accessorKey: "createdAt",
     header: "작성일",
     cell: ({ row }) => <DateCell value={row.original.createdAt} />,
     enableSorting: false,
-    meta: { label: "작성일" },
+    meta: { label: "작성일", kind: "date" },
   },
   {
     id: "actions",
@@ -90,6 +79,6 @@ export const columns: ColumnDef<AdminPost>[] = [
       </div>
     ),
     enableSorting: false,
-    meta: { label: "관리" },
+    meta: { label: "관리", kind: "actions" },
   },
 ];

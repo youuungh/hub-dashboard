@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { UserMinus } from "lucide-react";
 import { demoteCreator } from "@/lib/api/creators";
 import { toast } from "sonner";
@@ -70,33 +71,28 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         강등
       </Button>
 
-      <Dialog open={demoteDialogOpen} onOpenChange={setDemoteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>크리에이터 강등</DialogTitle>
-            <DialogDescription>
+      <AlertDialog open={demoteDialogOpen} onOpenChange={setDemoteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>크리에이터 강등</AlertDialogTitle>
+            <AlertDialogDescription>
               <strong>{data.username}</strong> 님을 일반 사용자로 강등할까요?
               크리에이터 권한이 모두 해제됩니다.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>취소</AlertDialogCancel>
             <Button
-              variant="outline"
-              onClick={() => setDemoteDialogOpen(false)}
-              disabled={actionLoading}
-            >
-              취소
-            </Button>
-            <Button
+              size="sm"
               variant="destructive"
               onClick={handleDemote}
               disabled={actionLoading}
             >
               {actionLoading ? "강등 중..." : "강등"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

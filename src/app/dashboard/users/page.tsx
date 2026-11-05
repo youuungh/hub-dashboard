@@ -18,10 +18,7 @@ export default async function Page(props: PageProps) {
 
   // key 없음, 조건마다 재마운트되면 표가 깜빡임
   return (
-    <ListPageShell
-      title="사용자"
-      description="가입한 사용자를 검색하고 권한과 활동을 확인합니다."
-    >
+    <ListPageShell title="사용자">
       <Suspense>
         <UserListingPage />
       </Suspense>

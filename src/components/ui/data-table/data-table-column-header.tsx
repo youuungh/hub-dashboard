@@ -2,6 +2,7 @@
 
 import type { Column } from "@tanstack/react-table";
 import { EyeOff } from "lucide-react";
+import * as React from "react";
 
 import {
   DropdownMenu,
@@ -10,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { isCentered } from "@/components/ui/data-table/column-kinds";
 import { cn } from "@/lib/utils";
 import {
   ChevronDownIcon,
@@ -32,6 +34,9 @@ export function DataTableColumnHeader<TData, TValue>({
   className,
   ...props
 }: DataTableColumnHeaderProps<TData, TValue>) {
+  // 마우스로 연 메뉴는 닫혀도 포커스를 되돌리지 않아 테두리가 안 남음
+  const openedByPointer = React.useRef(false);
+
   if (!column.getCanSort() && !column.getCanHide()) {
     return <div className={cn(className)}>{title}</div>;
   }
@@ -39,8 +44,17 @@ export function DataTableColumnHeader<TData, TValue>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        onPointerDown={() => {
+          openedByPointer.current = true;
+        }}
+        onKeyDown={() => {
+          openedByPointer.current = false;
+        }}
         className={cn(
-          "hover:bg-accent focus:ring-ring data-[state=open]:bg-accent [&_svg]:text-muted-foreground -ml-1.5 flex h-8 items-center gap-1.5 rounded-md px-2 py-1.5 focus:ring-1 focus:outline-none [&_svg]:size-4 [&_svg]:shrink-0",
+          // 32px 머리줄 안에 24px로, 테두리는 키보드 이동 때만
+          "hover:bg-foreground/[0.06] hover:text-foreground data-[state=open]:bg-foreground/[0.06] data-[state=open]:text-foreground focus-visible:ring-ring [&_svg]:text-muted-foreground flex h-6 items-center gap-1 rounded-md px-1.5 transition-colors outline-none focus-visible:ring-2 [&_svg]:size-3.5 [&_svg]:shrink-0",
+          // 왼쪽 칸은 글자가 내용과 같은 선에 오도록 여백만큼 당김
+          isCentered(column) ? "mx-auto" : "-ml-1.5",
           className,
         )}
         {...props}
@@ -55,7 +69,13 @@ export function DataTableColumnHeader<TData, TValue>({
             <CaretSortIcon />
           ))}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="min-w-36">
+      <DropdownMenuContent
+        align="start"
+        className="min-w-36"
+        onCloseAutoFocus={(event) => {
+          if (openedByPointer.current) event.preventDefault();
+        }}
+      >
         {column.getCanSort() && (
           <>
             <DropdownMenuCheckboxItem

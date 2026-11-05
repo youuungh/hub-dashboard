@@ -26,13 +26,7 @@ import { queryKeys } from "@/lib/query-keys";
 import type { MyProfile } from "@/types/user";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Upload } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = [
@@ -48,6 +42,11 @@ const profileFormSchema = z.object({
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
+
+// 왼쪽 이름표, 오른쪽 입력칸
+const ROW =
+  "grid gap-1.5 border-t px-4 py-3.5 first:border-t-0 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-start sm:gap-4";
+const ROW_LABEL = "text-[13px] font-medium sm:pt-1.5";
 
 export default function ProfileForm() {
   const me = useMe();
@@ -175,123 +174,140 @@ export default function ProfileForm() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>프로필 정보</CardTitle>
-        <CardDescription>
-          프로필 정보를 수정하고 다른 사용자에게 보이는 모습을 관리합니다
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-8">
-          <div className="flex items-center gap-6">
-            {avatarUrl ? (
-              <button
-                type="button"
-                className="cursor-pointer transition-opacity hover:opacity-80"
-                onClick={() => setImageViewerOpen(true)}
-              >
-                <UserAvatar src={avatarUrl} className="h-24 w-24" />
-              </button>
-            ) : (
-              <UserAvatar src={avatarUrl} className="h-24 w-24" />
-            )}
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-4">
-                <label htmlFor="avatar-upload">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled={uploadingAvatar}
-                    onClick={() =>
-                      document.getElementById("avatar-upload")?.click()
-                    }
-                  >
-                    <Upload className="mr-2 h-4 w-4" />
-                    {uploadingAvatar ? "업로드 중..." : "사진 변경"}
-                  </Button>
-                </label>
-                <input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/webp"
-                  className="hidden"
-                  onChange={handleAvatarUpload}
-                  disabled={uploadingAvatar}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                JPG · PNG · WebP · 최대 5MB
-              </p>
-            </div>
+    <div className="space-y-4">
+      <Card className="gap-0 py-0">
+        <CardHeader className="border-b py-3">
+          <CardTitle>프로필 사진</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-center gap-3.5 py-3.5">
+          {avatarUrl ? (
+            <button
+              type="button"
+              className="cursor-pointer rounded-full transition-opacity hover:opacity-80"
+              onClick={() => setImageViewerOpen(true)}
+            >
+              <UserAvatar src={avatarUrl} className="size-14" />
+            </button>
+          ) : (
+            <UserAvatar src={avatarUrl} className="size-14" />
+          )}
+          <div className="flex min-w-40 flex-1 flex-col gap-0.5">
+            <span className="font-medium">
+              {me.data?.displayName || me.data?.username}
+            </span>
+            <span className="text-muted-foreground text-xs">
+              JPEG · PNG · WebP, 5MB 이하
+            </span>
           </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={uploadingAvatar}
+            onClick={() => document.getElementById("avatar-upload")?.click()}
+          >
+            <Upload />
+            {uploadingAvatar ? "업로드 중..." : "사진 바꾸기"}
+          </Button>
+          <input
+            id="avatar-upload"
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            className="hidden"
+            onChange={handleAvatarUpload}
+            disabled={uploadingAvatar}
+          />
+        </CardContent>
+      </Card>
 
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">아이디</label>
-              <Input
-                value={me.data?.username ?? ""}
-                disabled
-                className="mt-2"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                변경할 수 없습니다
-              </p>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium">이메일</label>
-              <Input value={me.data?.email ?? ""} disabled className="mt-2" />
-              <p className="text-xs text-muted-foreground mt-1">
-                변경하려면 관리자에게 문의하세요
-              </p>
-            </div>
-          </div>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <Card className="gap-0 py-0">
+            <CardHeader className="border-b py-3">
+              <CardTitle>기본 정보</CardTitle>
+            </CardHeader>
+            <CardContent className="px-0">
               <FormField
                 control={form.control}
                 name="displayName"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>표시 이름</FormLabel>
-                    <FormControl>
-                      <Input placeholder="표시 이름을 입력하세요" {...field} />
-                    </FormControl>
-                    <FormMessage />
+                  <FormItem className={ROW}>
+                    <FormLabel className={ROW_LABEL}>표시 이름</FormLabel>
+                    <div className="space-y-1.5">
+                      <FormControl>
+                        <Input
+                          placeholder="표시 이름을 입력하세요"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </div>
                   </FormItem>
                 )}
               />
-
+              <div className={ROW}>
+                <label htmlFor="profile-username" className={ROW_LABEL}>
+                  아이디
+                </label>
+                <Input
+                  id="profile-username"
+                  value={me.data?.username ? `@${me.data.username}` : ""}
+                  readOnly
+                  className="text-muted-foreground border-dashed bg-transparent dark:bg-transparent"
+                />
+              </div>
+              <div className={ROW}>
+                <label htmlFor="profile-email" className={ROW_LABEL}>
+                  이메일
+                </label>
+                <Input
+                  id="profile-email"
+                  value={me.data?.email ?? ""}
+                  readOnly
+                  className="text-muted-foreground border-dashed bg-transparent dark:bg-transparent"
+                />
+              </div>
               <FormField
                 control={form.control}
                 name="bio"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>소개</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="자기소개를 입력하세요"
-                        className="resize-none"
-                        rows={4}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>최대 160자</FormDescription>
-                    <FormMessage />
+                  <FormItem className={ROW}>
+                    <FormLabel className={ROW_LABEL}>소개</FormLabel>
+                    <div className="space-y-1.5">
+                      <FormControl>
+                        <Textarea
+                          placeholder="자기소개를 입력하세요"
+                          className="min-h-[76px] resize-none"
+                          rows={3}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription className="text-right tabular-nums">
+                        {(field.value ?? "").length} / 160
+                      </FormDescription>
+                      <FormMessage />
+                    </div>
                   </FormItem>
                 )}
               />
-
-              <Button type="submit" disabled={submitting}>
+            </CardContent>
+            <div className="bg-band flex justify-end gap-2 rounded-b-lg border-t px-4 py-2.5">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={submitting || !form.formState.isDirty}
+                onClick={() => form.reset()}
+              >
+                되돌리기
+              </Button>
+              <Button type="submit" size="sm" disabled={submitting}>
                 {submitting ? "저장 중..." : "저장"}
               </Button>
-            </form>
-          </Form>
-        </div>
-      </CardContent>
+            </div>
+          </Card>
+        </form>
+      </Form>
 
       {imageViewerOpen && (
         <div
@@ -313,7 +329,7 @@ export default function ProfileForm() {
               <div className="fixed inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl -z-10" />
             </>
           ) : (
-            <div className="fixed inset-0 bg-black/50 animate-in fade-in-0 -z-10" />
+            <div className="fixed inset-0 bg-black/10 backdrop-blur-md animate-in fade-in-0 -z-10" />
           )}
           {/* eslint-disable-next-line @next/next/no-img-element -- 아바타 미리보기, next/image 최적화 대상 아님 */}
           <img
@@ -325,6 +341,6 @@ export default function ProfileForm() {
           />
         </div>
       )}
-    </Card>
+    </div>
   );
 }

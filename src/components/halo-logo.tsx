@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 
-// 앱 ic_halo_logo.xml을 옮긴 SVG
+// 앱 ic_halo_logo.xml을 옮긴 SVG, 아이콘용 여백은 잘라 그림을 칸에 꽉 차게
 export function HaloLogo({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 512 512" className={cn("size-full", className)}>
+    <svg viewBox="56 56 400 400" className={cn("size-full", className)}>
       <defs>
         <linearGradient
           id="halo-logo-gradient"

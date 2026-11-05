@@ -52,7 +52,7 @@ export function JobTable() {
 
   return (
     <DataTable table={table} loading={isPending} stale={isPlaceholderData}>
-      <DataTableToolbar table={table} />
+      <DataTableToolbar table={table} className="mt-0" />
     </DataTable>
   );
 }

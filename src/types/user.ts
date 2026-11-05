@@ -51,6 +51,8 @@ export interface UserProfile {
   followerCount: number;
   followingCount: number;
   postCount: number;
+  /** 크리에이터·관리자만, 일반은 null */
+  subscriberCount?: number | null;
 }
 
 export interface UserSummary {
@@ -63,6 +65,8 @@ export interface UserSummary {
   followerCount: number;
   followingCount: number;
   postCount: number;
+  /** 크리에이터·관리자만, 일반은 null */
+  subscriberCount?: number | null;
 }
 
 export type UserListResponse = PagedResponse<UserSummary>;

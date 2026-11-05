@@ -80,7 +80,7 @@ function MediaViewer({
       <DialogContent
         showCloseButton={false}
         // 로드 전 튀지 않게 고정 무대에 contain
-        className="fixed inset-0 top-0 left-0 flex h-screen w-screen max-w-none translate-x-0 translate-y-0 items-center justify-center rounded-none border-0 bg-black/80 p-6 shadow-none backdrop-blur-none sm:max-w-none"
+        className="fixed inset-0 top-0 left-0 flex h-screen w-screen max-w-none translate-x-0 translate-y-0 items-center justify-center rounded-none border-0 bg-black/70 p-6 shadow-none backdrop-blur-md sm:max-w-none"
       >
         <DialogTitle className="sr-only">
           첨부 {index + 1} / {items.length}

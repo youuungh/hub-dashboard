@@ -1,23 +1,24 @@
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
-// 본문만 헤더 높이만큼 내려 헤더 뒤로 흐려지게
 export default function PageContainer({
   children,
-  scrollable = true,
+  className,
 }: {
   children: React.ReactNode;
-  scrollable?: boolean;
+  className?: string;
 }) {
-  const inner = (
-    <div className="flex flex-1 flex-col px-4 pt-28 pb-10 md:px-6">
-      {children}
-    </div>
-  );
-
-  return scrollable ? (
-    <ScrollArea className="h-dvh">{inner}</ScrollArea>
-  ) : (
-    <div className="flex h-dvh flex-col overflow-hidden">{inner}</div>
+  return (
+    <ScrollArea className="min-h-0 flex-1">
+      <div
+        className={cn(
+          "mx-auto flex w-full max-w-[1200px] flex-col gap-4 px-4 pt-6 pb-12 md:px-6",
+          className,
+        )}
+      >
+        {children}
+      </div>
+    </ScrollArea>
   );
 }

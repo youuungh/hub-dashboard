@@ -1,13 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { PanelHeader } from "@/components/panel-header";
+import { Card } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -67,18 +62,16 @@ export function MaintenanceCard() {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">유지보수</CardTitle>
-          <CardDescription>
-            스케줄러가 자동으로 처리하지만 필요하면 지금 실행할 수 있습니다
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
+      <Card className="gap-0 py-0">
+        <PanelHeader title="유지보수" />
+        <div className="divide-y">
           {(Object.keys(JOBS) as Job[]).map((key) => (
-            <div key={key} className="flex items-center justify-between gap-4">
-              <div className="min-w-0 space-y-1">
-                <p className="text-sm font-medium">{JOBS[key].title}</p>
+            <div
+              key={key}
+              className="flex items-center justify-between gap-4 px-4 py-3"
+            >
+              <div className="min-w-0 space-y-0.5">
+                <p className="font-medium">{JOBS[key].title}</p>
                 <p className="text-muted-foreground text-xs">
                   {JOBS[key].description}
                 </p>
@@ -93,7 +86,7 @@ export function MaintenanceCard() {
               </Button>
             </div>
           ))}
-        </CardContent>
+        </div>
       </Card>
 
       <AlertDialog
@@ -117,7 +110,7 @@ export function MaintenanceCard() {
                 handleConfirm();
               }}
               disabled={running}
-              className={buttonVariants({ variant: "destructive" })}
+              className={buttonVariants({ variant: "destructive", size: "sm" })}
             >
               {running ? "실행 중..." : "실행"}
             </AlertDialogAction>

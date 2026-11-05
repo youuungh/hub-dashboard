@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Film, ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -20,6 +19,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getBotSchedule } from "@/lib/api/bot";
+import { tierLabel } from "@/lib/format";
 import { queryKeys } from "@/lib/query-keys";
 import { cn } from "@/lib/utils";
 import type { BotScheduleRow } from "@/types/bot";
@@ -30,15 +30,15 @@ const STATE: Record<string, { label: string; className: string }> = {
   WAITING: { label: "예정", className: "text-muted-foreground font-normal" },
   PENDING: {
     label: "올리는 중",
-    className: "border-primary/30 bg-primary/5 text-primary",
+    className: "font-normal",
   },
   DONE: {
     label: "올라감",
-    className: "border-primary/30 bg-primary/10 text-primary",
+    className: "font-normal",
   },
   SKIPPED: {
     label: "건너뜀",
-    className: "border-amber-500/30 bg-amber-500/10 text-amber-600",
+    className: "bg-muted text-muted-foreground border-transparent font-normal",
   },
   FAILED: {
     label: "실패",
@@ -142,31 +142,37 @@ export function ScheduleTab() {
     .map(([label, count]) => `${label} ${count}`)
     .join(" · ");
 
-  const mine = rows.filter((row) => row.creator === creator);
-  const nextOne = mine.find((row) => row.scheduledAt >= now);
-  const posted = mine.filter((row) => row.status === "DONE").length;
+  const nextOne = filtered.find((row) => row.scheduledAt >= now);
+  const posted = filtered.filter((row) => row.status === "DONE").length;
+
+  // 달력 첫 줄은 1일의 요일만큼 비움
+  const monthDays = daysOf(month);
+  const leading = weekdayOf(monthDays[0]);
+  const cells: (string | null)[] = [
+    ...Array.from({ length: leading }, () => null),
+    ...monthDays,
+  ];
+  while (cells.length % 7 !== 0) cells.push(null);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <div className="flex shrink-0 flex-wrap items-center gap-2">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex shrink-0 flex-wrap items-center gap-2 border-y px-4 py-2 md:px-6">
         <div className="flex items-center gap-1">
           <Button
-            size="icon"
+            size="icon-sm"
             variant="outline"
-            className="size-8"
             aria-label="이전 달"
             disabled={month <= firstMonth}
             onClick={() => moveMonth(-1)}
           >
             <ChevronLeft />
           </Button>
-          <span className="w-24 text-center text-sm font-semibold tabular-nums">
+          <span className="w-24 text-center font-semibold tabular-nums">
             {Number(month.slice(0, 4))}년 {Number(month.slice(5, 7))}월
           </span>
           <Button
-            size="icon"
+            size="icon-sm"
             variant="outline"
-            className="size-8"
             aria-label="다음 달"
             disabled={month >= lastMonth}
             onClick={() => moveMonth(1)}
@@ -178,7 +184,10 @@ export function ScheduleTab() {
           오늘
         </Button>
         <Select value={creator} onValueChange={setCreator}>
-          <SelectTrigger size="sm" className="w-40">
+          <SelectTrigger
+            size="sm"
+            className="bg-card h-[26px] w-40 text-xs data-[size=sm]:h-[26px]"
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -190,9 +199,9 @@ export function ScheduleTab() {
             ))}
           </SelectContent>
         </Select>
-        {creator !== "ALL" && (
-          <span className="text-muted-foreground text-sm">
-            전체 {mine.length}건 · 올라감 {posted}건
+        {rows.length > 0 && (
+          <span className="text-muted-foreground ml-auto text-xs">
+            전체 {filtered.length}건 · 올라감 {posted}건
             {nextOne &&
               ` · 다음 ${Number(nextOne.scheduledAt.slice(5, 7))}/${Number(nextOne.scheduledAt.slice(8, 10))} ${nextOne.scheduledAt.slice(11, 16)}`}
           </span>
@@ -200,29 +209,46 @@ export function ScheduleTab() {
       </div>
 
       {isPending && (
-        <div className="space-y-3">
-          <Skeleton className="h-28 w-full rounded-xl" />
-          <Skeleton className="h-64 w-full rounded-xl" />
+        <div className="space-y-3 p-4 md:p-6">
+          <Skeleton className="h-28 w-full rounded-lg" />
+          <Skeleton className="h-64 w-full rounded-lg" />
         </div>
       )}
       {!isPending && rows.length === 0 && (
-        <Card>
-          <CardContent className="text-muted-foreground py-10 text-center text-sm">
-            올린 일정표가 없습니다
-          </CardContent>
-        </Card>
+        <p className="text-muted-foreground py-16 text-center">
+          올린 일정표가 없습니다
+        </p>
       )}
 
       {!isPending && rows.length > 0 && (
-        <>
-          <Card className="shrink-0 py-0">
-            <CardContent className="grid grid-cols-8 gap-1.5 p-3 md:grid-cols-16">
-              {daysOf(month).map((key) => {
+        <div className="grid min-h-0 flex-1 overflow-auto lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)] lg:overflow-hidden">
+          <div className="bg-card min-h-0 lg:overflow-auto lg:border-r">
+            <div className="bg-thead grid grid-cols-7 border-b">
+              {WEEKDAYS.map((label) => (
+                <span
+                  key={label}
+                  className="text-muted-foreground px-2.5 py-1.5 text-xs font-medium"
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
+            <div className="grid grid-cols-7">
+              {cells.map((key, index) => {
+                if (!key) {
+                  return (
+                    <span
+                      key={`blank-${index}`}
+                      className="min-h-[84px] border-r border-b last:border-r-0 [&:nth-child(7n)]:border-r-0"
+                    />
+                  );
+                }
                 const count = byDay.get(key)?.length ?? 0;
                 const failed = byDay
                   .get(key)
                   ?.some((row) => row.status === "FAILED");
                 const selected = key === day;
+                const isToday = key === today;
                 return (
                   <button
                     key={key}
@@ -231,57 +257,56 @@ export function ScheduleTab() {
                     aria-pressed={selected}
                     onClick={() => setDay(key)}
                     className={cn(
-                      "relative flex flex-col items-center gap-0.5 rounded-lg border py-1.5 transition-colors",
-                      selected
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "hover:bg-muted",
-                      !selected && key === today && "border-primary/50",
+                      "hover:bg-muted/50 relative flex min-h-[84px] flex-col items-start gap-1.5 border-r border-b p-2 text-left transition-colors [&:nth-child(7n)]:border-r-0",
+                      selected && "bg-muted/70",
                     )}
                   >
                     <span
                       className={cn(
-                        "text-[11px]",
-                        !selected && "text-muted-foreground",
+                        "inline-flex size-[22px] items-center justify-center rounded-full text-xs font-medium tabular-nums",
+                        isToday && "bg-primary text-primary-foreground",
                       )}
                     >
-                      {WEEKDAYS[weekdayOf(key)]}
-                    </span>
-                    <span className="text-sm font-semibold tabular-nums">
                       {Number(key.slice(8))}
                     </span>
-                    <span
-                      className={cn(
-                        "text-[11px] tabular-nums",
-                        !selected && "text-muted-foreground",
-                      )}
-                    >
-                      {count}건
-                    </span>
+                    {count > 0 && (
+                      <span
+                        className={cn(
+                          "bg-muted rounded-[5px] px-1.5 text-[11.5px] font-medium tabular-nums",
+                          key < today
+                            ? "text-muted-foreground"
+                            : "text-foreground",
+                          selected && "bg-background",
+                        )}
+                      >
+                        {count}건
+                      </span>
+                    )}
                     {failed && (
-                      <span className="bg-destructive absolute top-1 right-1 size-1.5 rounded-full" />
+                      <span className="bg-destructive absolute top-2 right-2 size-1.5 rounded-full" />
                     )}
                   </button>
                 );
               })}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* 날짜 줄은 고정, 그날 목록만 카드 안에서 스크롤 */}
-          <Card className="min-h-0 flex-1 gap-0 py-0">
-            <div className="flex shrink-0 flex-wrap items-baseline justify-between gap-2 border-b px-4 py-3">
-              <h3 className="flex items-baseline gap-2 text-sm font-semibold">
-                {dayTitle(day)}
-                <span className="text-muted-foreground font-normal">
-                  {items.length}건
-                </span>
-              </h3>
+          {/* 그날 목록만 따로 스크롤, 머리줄은 위에 고정 */}
+          <section className="bg-card min-h-0 overflow-y-auto max-lg:border-t">
+            <div className="bg-card/60 sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b px-4 py-3 backdrop-blur-xl backdrop-saturate-150">
+              <h3 className="flex-1 font-semibold">{dayTitle(day)}</h3>
+              <Badge variant="outline" className="font-normal">
+                {items.length}건
+              </Badge>
               {mix && (
-                <span className="text-muted-foreground text-xs">{mix}</span>
+                <span className="text-muted-foreground w-full text-xs">
+                  {mix}
+                </span>
               )}
             </div>
-            <CardContent className="min-h-0 flex-1 divide-y overflow-y-auto p-0">
+            <div className="divide-y">
               {items.length === 0 && (
-                <p className="text-muted-foreground py-10 text-center text-sm">
+                <p className="text-muted-foreground py-10 text-center">
                   이 날은 일정이 없습니다
                 </p>
               )}
@@ -292,61 +317,69 @@ export function ScheduleTab() {
                       (row.scheduledAt < now ? "PENDING" : "WAITING")
                   ];
                 return (
-                  <div
-                    key={row.id}
-                    className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm sm:flex-nowrap"
-                  >
-                    <span className="text-muted-foreground w-12 shrink-0 tabular-nums">
+                  <div key={row.id} className="flex gap-2.5 px-4 py-2.5">
+                    <span className="w-10 shrink-0 font-medium tabular-nums">
                       {row.scheduledAt.slice(11, 16)}
                     </span>
-                    <span className="w-20 shrink-0 truncate font-medium">
-                      {row.creatorName}
-                    </span>
-                    <span className="flex w-28 shrink-0 items-center gap-1.5">
-                      <Badge variant="secondary" className="font-normal">
-                        {kindLabel(row)}
-                      </Badge>
-                      {row.tier && row.tier !== "FREE" && (
-                        <Badge variant="outline" className="font-normal">
-                          {row.tier === "TIER1" ? "1단계" : "2단계"}
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="font-medium">{row.creatorName}</span>
+                        <Badge
+                          variant="outline"
+                          className="bg-muted text-muted-foreground border-transparent font-normal"
+                        >
+                          {kindLabel(row)}
+                        </Badge>
+                        {row.tier && row.tier !== "FREE" && (
+                          <Badge
+                            variant="outline"
+                            className="bg-muted text-muted-foreground border-transparent font-normal"
+                          >
+                            {tierLabel(row.tier)}
+                          </Badge>
+                        )}
+                        <span className="text-muted-foreground flex items-center gap-1.5">
+                          {row.imageCount > 0 && (
+                            <span className="flex items-center gap-0.5 text-xs">
+                              <ImageIcon className="size-3.5" />
+                              {row.imageCount}
+                            </span>
+                          )}
+                          {row.hasVideo && <Film className="size-3.5" />}
+                        </span>
+                      </div>
+                      <span
+                        className="text-foreground/70 truncate"
+                        title={row.text}
+                      >
+                        {row.text}
+                      </span>
+                    </div>
+                    <span className="shrink-0 self-start">
+                      {row.error ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Badge
+                              variant="outline"
+                              className={cn("cursor-help", state.className)}
+                            >
+                              {state.label}
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>{row.error}</TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <Badge variant="outline" className={state.className}>
+                          {state.label}
                         </Badge>
                       )}
                     </span>
-                    <span className="min-w-0 flex-1 truncate" title={row.text}>
-                      {row.text}
-                    </span>
-                    <span className="text-muted-foreground flex shrink-0 items-center gap-2">
-                      {row.imageCount > 0 && (
-                        <span className="flex items-center gap-0.5 text-xs">
-                          <ImageIcon className="size-3.5" />
-                          {row.imageCount}
-                        </span>
-                      )}
-                      {row.hasVideo && <Film className="size-3.5" />}
-                    </span>
-                    {row.error ? (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Badge
-                            variant="outline"
-                            className={cn("cursor-help", state.className)}
-                          >
-                            {state.label}
-                          </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent>{row.error}</TooltipContent>
-                      </Tooltip>
-                    ) : (
-                      <Badge variant="outline" className={state.className}>
-                        {state.label}
-                      </Badge>
-                    )}
                   </div>
                 );
               })}
-            </CardContent>
-          </Card>
-        </>
+            </div>
+          </section>
+        </div>
       )}
     </div>
   );

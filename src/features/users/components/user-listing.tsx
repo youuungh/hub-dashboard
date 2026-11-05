@@ -3,6 +3,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { DEFAULT_PAGE_SIZE, selectFilterParser } from "@/hooks/use-data-table";
+import { getSortingStateParser } from "@/lib/parsers";
 import { getUsers } from "@/lib/api/users";
 import type { UserSummary } from "@/types/user";
 import { queryKeys } from "@/lib/query-keys";
@@ -21,23 +22,20 @@ export default function UserListingPage() {
   const [username] = useQueryState("username", parseAsString);
   const [roles] = useQueryState("role", selectFilterParser);
   const role = roles?.[0];
-  const [sort] = useQueryState("sort", parseAsString);
+  // 표가 쓰는 파서와 같아야 화면 안에서 바꾼 정렬이 그대로 넘어옴
+  const [sorting] = useQueryState(
+    "sort",
+    // 열 id는 화면 기준이라 행 타입 키와 다를 수 있음
+    getSortingStateParser<Record<string, unknown>>(),
+  );
+  const sort = sorting?.[0];
 
   const { data, isPending, isPlaceholderData } = useQuery({
     queryKey: [...queryKeys.users, { page, perPage, role, username, sort }],
     queryFn: () => {
       // 서버는 소문자 컬럼명을 받음
-      let sortBy: string | undefined;
-      let sortOrder: string | undefined;
-      if (sort) {
-        try {
-          const parsed = JSON.parse(sort) as { id: string; desc: boolean }[];
-          if (parsed.length > 0) {
-            sortBy = parsed[0].id.replace(/([A-Z])/g, (m) => m.toLowerCase());
-            sortOrder = parsed[0].desc ? "desc" : "asc";
-          }
-        } catch {}
-      }
+      const sortBy = sort?.id.toLowerCase();
+      const sortOrder = sort ? (sort.desc ? "desc" : "asc") : undefined;
 
       return getUsers(
         page,

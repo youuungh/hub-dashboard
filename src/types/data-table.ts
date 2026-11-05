@@ -1,5 +1,4 @@
 import type { DataTableConfig } from "@/config/data-table";
-import type { FilterItemSchema } from "@/lib/parsers";
 import type { ColumnSort, RowData } from "@tanstack/react-table";
 
 declare module "@tanstack/react-table" {
@@ -12,8 +11,19 @@ declare module "@tanstack/react-table" {
     range?: [number, number];
     unit?: string;
     icon?: React.FC<React.SVGProps<SVGSVGElement>>;
+    /** select 필터를 표 위 탭으로 표시 */
+    asTabs?: boolean;
+    /** 열 폭은 종류로 정함, 없으면 긴 글처럼 남는 폭을 나눠 가짐 */
+    kind?: ColumnKind;
+    /** 종류 폭이 안 맞는 열만 px로 덮어씀 */
+    width?: number;
+    /** 남는 폭을 나눠 받을지, 종류 기본값을 덮어씀 */
+    stretch?: boolean;
   }
 }
+
+export type ColumnKind =
+  "entity" | "badge" | "number" | "date" | "meter" | "actions" | "text";
 
 export interface Option {
   label: string;
@@ -22,12 +32,7 @@ export interface Option {
   icon?: React.FC<React.SVGProps<SVGSVGElement>>;
 }
 
-export type FilterOperator = DataTableConfig["operators"][number];
 export type FilterVariant = DataTableConfig["filterVariants"][number];
 export interface ExtendedColumnSort<TData> extends Omit<ColumnSort, "id"> {
-  id: Extract<keyof TData, string>;
-}
-
-export interface ExtendedColumnFilter<TData> extends FilterItemSchema {
   id: Extract<keyof TData, string>;
 }

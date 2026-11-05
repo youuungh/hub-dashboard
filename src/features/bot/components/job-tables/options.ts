@@ -19,6 +19,19 @@ export const GROUP_LABELS: Record<BotJobGroup, string> = {
   REPLY: "커뮤니티 답글",
 };
 
+// 서버 BotJobGroup과 같은 묶음
+export const KIND_GROUPS: Record<BotJobKind, BotJobGroup> = {
+  ITEM: "POST",
+  GENERATE: "COMMENT",
+  COMMENT: "COMMENT",
+  COMMENT_LIKES: "REACTION",
+  POST_LIKES: "REACTION",
+  CLAIMS: "REACTION",
+  WISHES: "REACTION",
+  FOLLOW: "REACTION",
+  VISITOR: "REPLY",
+};
+
 export const STATUS_LABELS: Record<BotJobStatus, string> = {
   PENDING: "대기",
   DONE: "완료",

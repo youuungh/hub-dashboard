@@ -3,6 +3,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { DataTable } from "@/components/ui/data-table/data-table";
+import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar";
 import { DEFAULT_PAGE_SIZE, useDataTable } from "@/hooks/use-data-table";
 import { getBotAiComments } from "@/lib/api/bot";
 import { queryKeys } from "@/lib/query-keys";
@@ -33,6 +34,8 @@ export function AiCommentTable() {
   });
 
   return (
-    <DataTable table={table} loading={isPending} stale={isPlaceholderData} />
+    <DataTable table={table} loading={isPending} stale={isPlaceholderData}>
+      <DataTableToolbar table={table} className="mt-0" />
+    </DataTable>
   );
 }

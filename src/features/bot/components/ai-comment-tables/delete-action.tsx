@@ -66,7 +66,7 @@ export function DeleteAction({ data }: { data: BotAiComment }) {
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={remove.isPending}
-              className={buttonVariants({ variant: "destructive" })}
+              className={buttonVariants({ variant: "destructive", size: "sm" })}
               onClick={(event) => {
                 event.preventDefault();
                 remove.mutate();

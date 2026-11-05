@@ -7,10 +7,7 @@ export const metadata = {
 
 export default function Page() {
   return (
-    <ListPageShell
-      title="포스트"
-      description="전체 포스트를 확인하고 필요하면 블라인드 처리합니다."
-    >
+    <ListPageShell title="포스트">
       <PostListingPage />
     </ListPageShell>
   );

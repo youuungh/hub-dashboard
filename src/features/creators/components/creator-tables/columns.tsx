@@ -24,6 +24,7 @@ export const columns: ColumnDef<CreatorApplication>[] = [
     ),
     meta: {
       label: "신청자",
+      kind: "entity",
       placeholder: "아이디 검색...",
       variant: "text",
       icon: Text,
@@ -47,15 +48,17 @@ export const columns: ColumnDef<CreatorApplication>[] = [
     enableColumnFilter: true,
     meta: {
       label: "상태",
+      kind: "badge",
       variant: "select",
       options: STATUS_OPTIONS,
+      asTabs: true,
     },
   },
   {
     accessorKey: "reason",
     header: "신청 사유",
     cell: ({ row }) => <ApplicationDialog data={row.original} />,
-    meta: { label: "신청 사유" },
+    meta: { label: "신청 사유", kind: "text" },
     enableSorting: false,
   },
   {
@@ -64,7 +67,7 @@ export const columns: ColumnDef<CreatorApplication>[] = [
       <DataTableColumnHeader column={column} title="신청일" />
     ),
     cell: ({ row }) => <DateCell value={row.original.createdAt} />,
-    meta: { label: "신청일" },
+    meta: { label: "신청일", kind: "date" },
   },
   {
     accessorKey: "reviewedAt",
@@ -72,7 +75,7 @@ export const columns: ColumnDef<CreatorApplication>[] = [
       <DataTableColumnHeader column={column} title="처리일" />
     ),
     cell: ({ row }) => <DateCell value={row.original.reviewedAt} />,
-    meta: { label: "처리일" },
+    meta: { label: "처리일", kind: "date" },
   },
   {
     id: "actions",
@@ -82,7 +85,7 @@ export const columns: ColumnDef<CreatorApplication>[] = [
         <CellAction data={row.original} />
       </div>
     ),
-    meta: { label: "관리" },
+    meta: { label: "관리", kind: "actions" },
     enableSorting: false,
   },
 ];
