@@ -19,9 +19,11 @@ import { KIND_LABELS, formatShortTime } from "./job-tables/options";
 export function BotSummaryCard({
   summary,
   loading,
+  className,
 }: {
   summary?: BotSummary;
   loading: boolean;
+  className?: string;
 }) {
   const state = botState(summary);
   const daysLeft = summary?.scheduleDaysLeft ?? null;
@@ -44,10 +46,11 @@ export function BotSummaryCard({
         },
       ]
     : [];
-  const upcoming = summary?.upcomingJobs.slice(0, 3) ?? [];
+  // 오른쪽 열 높이까지 늘어난 자리를 채울 만큼
+  const upcoming = summary?.upcomingJobs.slice(0, 5) ?? [];
 
   return (
-    <Card className="gap-0 py-0">
+    <Card className={cn("gap-0 py-0", className)}>
       <PanelHeader
         title="자동화"
         aside={
@@ -74,13 +77,14 @@ export function BotSummaryCard({
           {loading ? "불러오는 중" : "자동화 상태를 불러올 수 없습니다"}
         </p>
       ) : (
-        <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-          <div className="grid grid-cols-2 max-lg:border-b lg:border-r">
+        <div className="grid flex-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+          {/* 카드가 늘어나도 네 칸이 높이를 반씩 나눠 가짐 */}
+          <div className="grid grid-cols-2 grid-rows-2 max-lg:border-b lg:border-r">
             {stats.map((stat, index) => (
               <div
                 key={stat.label}
                 className={cn(
-                  "px-4 py-3",
+                  "flex flex-col justify-center px-4 py-3",
                   index % 2 === 0 && "border-r",
                   index >= 2 && "border-t",
                 )}
@@ -116,14 +120,12 @@ export function BotSummaryCard({
                   <span className="w-20 shrink-0 font-medium whitespace-nowrap tabular-nums">
                     {formatShortTime(parseServerDate(job.runAt))}
                   </span>
-                  <span className="w-[5.5rem] shrink-0">
-                    <Badge
-                      variant="outline"
-                      className="bg-muted text-muted-foreground border-transparent font-normal"
-                    >
-                      {KIND_LABELS[job.kind]}
-                    </Badge>
-                  </span>
+                  <Badge
+                    variant="outline"
+                    className="bg-muted text-muted-foreground shrink-0 border-transparent font-normal"
+                  >
+                    {KIND_LABELS[job.kind]}
+                  </Badge>
                   <span
                     className="text-foreground/80 min-w-0 flex-1 truncate"
                     title={job.target}

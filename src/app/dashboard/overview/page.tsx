@@ -293,8 +293,8 @@ export default function OverviewPage() {
         />
       </KpiStrip>
 
-      {/* 넓은 왼쪽은 주문·자동화, 좁은 오른쪽은 요약을 위에서부터 쌓음 */}
-      <div className="grid items-start gap-3 lg:grid-cols-3">
+      {/* 넓은 왼쪽은 주문·자동화, 좁은 오른쪽은 요약. 두 열 아래 끝을 맞춤 */}
+      <div className="grid gap-3 lg:grid-cols-3">
         <div className="flex min-w-0 flex-col gap-3 lg:col-span-2">
           <Card className="gap-0 py-0">
             <PanelHeader
@@ -358,7 +358,11 @@ export default function OverviewPage() {
               </div>
             </div>
           </Card>
-          <BotSummaryCard summary={summary} loading={bot.isPending} />
+          <BotSummaryCard
+            summary={summary}
+            loading={bot.isPending}
+            className="lg:flex-1"
+          />
         </div>
         <div className="flex min-w-0 flex-col gap-3">
           <Card className="gap-0 py-0">

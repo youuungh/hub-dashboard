@@ -47,10 +47,12 @@ export interface ProfileUser {
   subscriberCount?: number | null;
 }
 
+// 구독자 칸은 늘 두고 일반 사용자는 "—", 받는 중에 칸 수가 바뀌지 않게
 const STATS = [
   { key: "followerCount", label: "팔로워" },
   { key: "followingCount", label: "팔로잉" },
   { key: "postCount", label: "포스트" },
+  { key: "subscriberCount", label: "구독자" },
 ] as const;
 
 const isVerified = (role?: UserRole) => role === "CREATOR" || role === "ADMIN";
@@ -91,13 +93,6 @@ export function UserProfileCell({
           avatarUrl: user.avatarUrl,
         });
   const name = shown.displayName || shown.username;
-  // 사용자 목록 행엔 구독자 수가 있어 받기 전에도 칸을 바로 그림
-  const subscribers =
-    fetched?.subscriberCount ?? (complete ? user.subscriberCount : undefined);
-  const stats =
-    typeof subscribers === "number"
-      ? [...STATS, { key: "subscriberCount", label: "구독자" } as const]
-      : STATS;
 
   return (
     <>
@@ -150,16 +145,14 @@ export function UserProfileCell({
               {getApiErrorMessage(error) || "프로필을 불러오지 못했습니다"}
             </p>
           ) : (
-            <div
-              className="divide-border grid divide-x rounded-lg border"
-              style={{
-                gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
-              }}
-            >
-              {stats.map(({ key, label }) => (
+            <div className="divide-border grid grid-cols-4 divide-x rounded-lg border">
+              {STATS.map(({ key, label }) => (
                 <div key={key} className="flex flex-col items-center py-3">
                   {loading ? (
                     <Skeleton className="h-7 w-10" />
+                  ) : key === "subscriberCount" &&
+                    typeof shown.subscriberCount !== "number" ? (
+                    <span className="text-muted-foreground text-lg">—</span>
                   ) : (
                     <span className="text-lg font-semibold tabular-nums">
                       {(shown[key] ?? 0).toLocaleString()}
