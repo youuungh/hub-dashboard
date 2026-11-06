@@ -24,6 +24,7 @@ import {
   LEVELS,
   RANGES,
   formatLogTime,
+  statusDot,
 } from "../options";
 import { LogDetail } from "./log-detail";
 import { LogHistogram } from "./log-histogram";
@@ -55,16 +56,12 @@ export default function LogView() {
   }, [input]);
 
   const params = { minutes, level, source, keyword };
-  const { data, isPending } = useQuery({
+  // 실패해도 계속 불러 서버가 다시 뜨면 이어짐
+  const { data, isPending, isError } = useQuery({
     queryKey: queryKeys.logs(params),
     queryFn: () => getLogs(params),
     placeholderData: keepPreviousData,
-    refetchInterval: (query) =>
-      streaming && query.state.status !== "error"
-        ? minutes <= 60
-          ? LIVE_MS
-          : SLOW_MS
-        : false,
+    refetchInterval: streaming ? (minutes <= 60 ? LIVE_MS : SLOW_MS) : false,
     meta: { errorMessage: "로그를 불러오는데 실패했습니다" },
   });
 
@@ -85,6 +82,7 @@ export default function LogView() {
       count: counts?.[key.toLowerCase() as "error" | "warn" | "info"],
     })),
   ];
+  const matched = levelButtons.find((item) => item.key === level)?.count ?? 0;
   const pickSource = (value: string | null) => {
     setSource(value);
     setSelected(null);
@@ -219,14 +217,16 @@ export default function LogView() {
             className="bg-card h-[26px] gap-2 px-2.5 text-xs"
           >
             <span className="relative flex size-2">
-              {streaming && (
+              {streaming && !isError && (
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-green-600/60 motion-reduce:hidden" />
               )}
               <span
                 className={cn(
                   "relative inline-flex size-2 rounded-full",
                   streaming
-                    ? "bg-green-600"
+                    ? isError
+                      ? "bg-destructive"
+                      : "bg-green-600"
                     : live
                       ? "bg-amber-500"
                       : "bg-muted-foreground/50",
@@ -237,9 +237,11 @@ export default function LogView() {
               ? "멈춤"
               : hovering
                 ? "멈춤 · 목록 위"
-                : minutes <= 60
-                  ? "실시간 · 3초마다"
-                  : "실시간 · 15초마다"}
+                : isError
+                  ? "연결 끊김 · 다시 시도 중"
+                  : minutes <= 60
+                    ? "실시간 · 3초마다"
+                    : "실시간 · 15초마다"}
           </Button>
         </div>
       </div>
@@ -248,21 +250,26 @@ export default function LogView() {
         <LogHistogram buckets={data.histogram} />
       ) : (
         <div className="shrink-0 border-b px-4 py-3 md:px-6">
-          <Skeleton className="h-[86px] w-full" />
+          <Skeleton className="h-[90px] w-full" />
         </div>
       )}
 
       <div className="flex min-h-0 flex-1">
         {/* 표와 같은 기본 스크롤, 막대는 머리줄 아래부터 */}
+        {/* 터치는 떼도 멈춤이 안 풀려 마우스만 */}
         <div
-          onMouseEnter={() => setHovering(true)}
-          onMouseLeave={() => setHovering(false)}
+          onPointerEnter={(event) =>
+            event.pointerType === "mouse" && setHovering(true)
+          }
+          onPointerLeave={(event) =>
+            event.pointerType === "mouse" && setHovering(false)
+          }
           className="bg-thead-gutter scroll-below-thead min-h-0 flex-1 overflow-auto [scrollbar-gutter:stable]"
         >
           <div
             className={cn(
               ROW_GRID,
-              "bg-thead text-muted-foreground sticky top-0 z-10 h-8 border-b text-xs font-medium",
+              "bg-thead text-muted-foreground sticky top-0 z-10 h-[33px] border-b text-xs font-medium",
             )}
           >
             <span>시각</span>
@@ -326,7 +333,30 @@ export default function LogView() {
                   <span className="text-muted-foreground truncate max-md:hidden">
                     {entry.source}
                   </span>
-                  <span className="truncate">{entry.message}</span>
+                  {entry.request ? (
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span className="flex shrink-0 items-center gap-1.5 font-mono text-xs tabular-nums">
+                        <span
+                          className={cn(
+                            "size-1.5 rounded-full",
+                            statusDot(entry.request.status),
+                          )}
+                        />
+                        {entry.request.status}
+                      </span>
+                      <span className="border-foreground/15 flex h-[18px] min-w-11 shrink-0 items-center justify-center rounded-[5px] border px-1 font-mono text-[10.5px] font-semibold">
+                        {entry.request.method}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate">
+                        {entry.request.path}
+                      </span>
+                      <span className="text-muted-foreground min-w-[52px] shrink-0 text-right font-mono text-xs tabular-nums max-md:hidden">
+                        {entry.request.durationMs.toLocaleString()}ms
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="truncate">{entry.message}</span>
+                  )}
                 </button>
                 {/* 좁은 화면은 옆 패널 대신 줄 아래에 펼침 */}
                 {active && (
@@ -341,6 +371,12 @@ export default function LogView() {
               </Fragment>
             );
           })}
+
+          {data && data.entries.length > 0 && data.entries.length < matched && (
+            <p className="text-muted-foreground py-3 text-center text-xs">
+              최근 {data.entries.length.toLocaleString()}건까지만 표시합니다
+            </p>
+          )}
         </div>
 
         {selected && (

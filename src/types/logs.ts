@@ -9,6 +9,15 @@ export interface LogEntry {
   source: string;
   message: string;
   stack: string | null;
+  /** HTTP 요청 줄만 */
+  request: LogRequest | null;
+}
+
+export interface LogRequest {
+  status: number;
+  method: string;
+  path: string;
+  durationMs: number;
 }
 
 export interface LogBucket {

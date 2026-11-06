@@ -19,6 +19,8 @@ declare module "@tanstack/react-table" {
     width?: number;
     /** 남는 폭을 나눠 받을지, 종류 기본값을 덮어씀 */
     stretch?: boolean;
+    /** 좁은 화면에서 숨김 */
+    mobileHidden?: boolean;
   }
 }
 

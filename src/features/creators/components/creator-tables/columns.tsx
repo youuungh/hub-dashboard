@@ -75,7 +75,7 @@ export const columns: ColumnDef<CreatorApplication>[] = [
       <DataTableColumnHeader column={column} title="처리일" />
     ),
     cell: ({ row }) => <DateCell value={row.original.reviewedAt} />,
-    meta: { label: "처리일", kind: "date" },
+    meta: { label: "처리일", kind: "date", mobileHidden: true },
   },
   {
     id: "actions",

@@ -17,14 +17,14 @@ export default function SearchInput() {
         variant="ghost"
         size="icon-sm"
         aria-label="검색"
-        className="text-muted-foreground md:hidden"
+        className="text-muted-foreground desk:hidden"
         onClick={query.toggle}
       >
         <IconSearch />
       </Button>
       <Button
         variant="outline"
-        className="bg-card text-muted-foreground hidden h-7 w-[200px] justify-between md:flex gap-2.5 rounded-full pr-1.5 pl-2.5 text-xs font-normal shadow-none active:scale-100"
+        className="bg-card text-muted-foreground hidden h-7 w-[200px] justify-between desk:flex gap-2.5 rounded-full pr-1.5 pl-2.5 text-xs font-normal shadow-none active:scale-100"
         onClick={query.toggle}
       >
         <span className="flex items-center gap-2">

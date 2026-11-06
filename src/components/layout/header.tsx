@@ -22,7 +22,7 @@ function useCrumb() {
   return navItems.find((item) => pathname.startsWith(item.url))?.title ?? "";
 }
 
-// 좁은 화면에서는 사이드바 대신 시트로
+// 좁거나 낮은 화면에서는 사이드바 대신 시트로
 function MobileNav() {
   const [open, setOpen] = React.useState(false);
   return (
@@ -31,12 +31,12 @@ function MobileNav() {
         <button
           type="button"
           aria-label="메뉴 열기"
-          className="text-muted-foreground hover:text-foreground hover:bg-accent -ml-1.5 flex size-7 items-center justify-center rounded-md md:hidden"
+          className="text-muted-foreground hover:text-foreground hover:bg-accent -ml-1.5 flex size-7 items-center justify-center rounded-md desk:hidden"
         >
           <IconMenu2 className="size-4" />
         </button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-60 p-2 pt-12">
+      <SheetContent side="left" className="w-60 overflow-y-auto p-2 pt-12">
         <SheetTitle className="sr-only">메뉴</SheetTitle>
         <NavList onNavigate={() => setOpen(false)} />
       </SheetContent>

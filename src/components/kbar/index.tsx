@@ -78,7 +78,8 @@ const KBarComponent = ({ children }: { children: React.ReactNode }) => {
     <>
       <KBarPortal>
         <KBarPositioner className="fixed inset-0 z-99999 bg-black/10 px-4! py-0! backdrop-blur-md">
-          <KBarAnimator className="bg-popover text-popover-foreground relative mt-40! w-full max-w-[560px] -translate-y-12! overflow-hidden rounded-lg border shadow-lg">
+          {/* 모바일은 키보드 위에 다 보이게 위로 붙임 */}
+          <KBarAnimator className="bg-popover text-popover-foreground relative mt-40! w-full max-w-[560px] -translate-y-12! overflow-hidden rounded-lg border shadow-lg mobile:mt-3! mobile:translate-y-0!">
             <div className="border-border sticky top-0 z-10 border-b">
               <KBarSearch
                 defaultPlaceholder="이동할 화면이나 명령 검색…"

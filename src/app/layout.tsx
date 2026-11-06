@@ -19,6 +19,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: META_THEME_COLORS.light,
+  // 키보드가 올라오면 화면 높이를 줄여 창이 가려지지 않게
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({

@@ -30,7 +30,7 @@ export default async function DashboardLayout({
     <AuthGuard>
       <KBar>
         <NextTopLoader color="#71717a" showSpinner={false} height={2} />
-        <div className="flex h-dvh flex-col">
+        <div className="flex h-dvh flex-col short:h-auto short:min-h-dvh">
           <Header />
           <div className="flex min-h-0 flex-1">
             <AppSidebar defaultMode={sidebarMode} />

@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { getCommonPinningStyles } from "@/lib/data-table";
 import { cn } from "@/lib/utils";
 import {
@@ -28,6 +29,8 @@ const TEXT_MIN_WIDTH = 280;
 
 // 가운데 칸은 안쪽 flex 묶음도 가운데로
 const CENTER_CELL = "text-center [&>div]:justify-center";
+
+const NARROW_QUERY = "(width < 48rem)";
 
 // 긴 글 열이 없을 때만 남는 폭을 늘어나는 열에 나눔
 function columnWidths<TData>(
@@ -82,7 +85,10 @@ export function DataTable<TData>({
     return () => observer.disconnect();
   }, []);
 
-  const columns = table.getVisibleLeafColumns();
+  const narrow = useMediaQuery(NARROW_QUERY);
+  const shown = (column: Column<TData>) =>
+    !(narrow && column.columnDef.meta?.mobileHidden);
+  const columns = table.getVisibleLeafColumns().filter(shown);
   const widths = columnWidths(columns, boxWidth);
   const widthOf = new Map(
     columns.map((column, index) => [column.id, widths[index]]),
@@ -106,24 +112,26 @@ export function DataTable<TData>({
           <TableHeader className="bg-thead sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    className={cn(isCentered(header.column) && CENTER_CELL)}
-                    style={{
-                      ...getCommonPinningStyles({ column: header.column }),
-                      width: widthOf.get(header.column.id),
-                    }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
+                {headerGroup.headers
+                  .filter((header) => shown(header.column))
+                  .map((header) => (
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className={cn(isCentered(header.column) && CENTER_CELL)}
+                      style={{
+                        ...getCommonPinningStyles({ column: header.column }),
+                        width: widthOf.get(header.column.id),
+                      }}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -158,21 +166,24 @@ export function DataTable<TData>({
                     animationDelay: `${Math.min(rowIndex, 24) * 18}ms`,
                   }}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(isCentered(cell.column) && CENTER_CELL)}
-                      style={{
-                        ...getCommonPinningStyles({ column: cell.column }),
-                        width: widthOf.get(cell.column.id),
-                      }}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
+                  {row
+                    .getVisibleCells()
+                    .filter((cell) => shown(cell.column))
+                    .map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={cn(isCentered(cell.column) && CENTER_CELL)}
+                        style={{
+                          ...getCommonPinningStyles({ column: cell.column }),
+                          width: widthOf.get(cell.column.id),
+                        }}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
                 </TableRow>
               ))
             ) : (

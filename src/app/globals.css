@@ -3,6 +3,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* 넓고 높은 화면만 사이드바·검색창, 가로로 돌린 폰은 모바일 틀 */
+@custom-variant desk (@media (width >= 48rem) and (height >= 31.25rem));
+@custom-variant mobile (@media not all and (width >= 48rem) and (height >= 31.25rem));
+/* 낮은 화면은 표 안쪽 대신 페이지 전체 스크롤 */
+@custom-variant short (@media (height < 31.25rem));
+
 @import "./theme.css";
 
 /* 목록 툴바 띠와 표 머리 */

@@ -115,15 +115,16 @@ export default function OverviewPage() {
             <Skeleton key={index} className="h-[92px] rounded-lg" />
           ))}
         </div>
-        <div className="grid items-start gap-3 lg:grid-cols-3">
+        {/* 본 화면 카드 높이, 자동화 칸이 늘어나 끝을 맞춤 */}
+        <div className="grid gap-3 lg:grid-cols-3">
           <div className="flex flex-col gap-3 lg:col-span-2">
-            <Skeleton className="h-60 rounded-lg" />
-            <Skeleton className="h-48 rounded-lg" />
+            <Skeleton className="h-[233px] rounded-lg" />
+            <Skeleton className="h-[273px] rounded-lg lg:flex-1" />
           </div>
           <div className="flex flex-col gap-3">
-            <Skeleton className="h-28 rounded-lg" />
-            <Skeleton className="h-36 rounded-lg" />
-            <Skeleton className="h-56 rounded-lg" />
+            <Skeleton className="h-[91px] rounded-lg" />
+            <Skeleton className="h-[185px] rounded-lg" />
+            <Skeleton className="h-[226px] rounded-lg" />
           </div>
         </div>
       </PageContainer>

@@ -54,7 +54,7 @@ export const columns: ColumnDef<AdminPost>[] = [
       );
     },
     enableSorting: false,
-    meta: { label: "상태", kind: "badge", width: 140 },
+    meta: { label: "상태", kind: "badge", width: 140, mobileHidden: true },
   },
   {
     id: "content",

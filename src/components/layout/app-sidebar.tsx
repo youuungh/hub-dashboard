@@ -136,7 +136,7 @@ export default function AppSidebar({
     // 올리면 펼침은 자리는 좁게 두고 본문 위로 겹쳐 펼침
     <div
       className={cn(
-        "relative hidden shrink-0 md:block",
+        "relative hidden shrink-0 desk:block",
         mode === "expanded" ? "w-52" : "w-[52px]",
       )}
     >

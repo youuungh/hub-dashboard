@@ -66,7 +66,7 @@ const ResultItem = React.forwardRef(
           </div>
         </div>
         {action.shortcut?.length ? (
-          <div className="grid grid-flow-col gap-1">
+          <div className="grid grid-flow-col gap-1 pointer-coarse:hidden">
             {action.shortcut.map((sc, i) => (
               <kbd
                 key={sc + i}

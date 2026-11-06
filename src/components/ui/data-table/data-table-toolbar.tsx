@@ -29,6 +29,10 @@ export function DataTableToolbar<TData>({
   );
   const tabColumn = columns.find((column) => column.columnDef.meta?.asTabs);
   const filterColumns = columns.filter((column) => column !== tabColumn);
+  const empty =
+    !tabColumn &&
+    !children &&
+    !filterColumns.some((column) => column.columnDef.meta?.variant);
 
   // 탭은 전체 탭이 초기화 역할
   const isFiltered = table
@@ -71,6 +75,7 @@ export function DataTableToolbar<TData>({
         className={cn(
           "flex w-full shrink-0 flex-wrap items-center gap-2 border-y px-4 py-2 md:px-6",
           !tabColumn && "mt-4",
+          empty && "max-lg:border-b-0 max-lg:py-0",
           className,
         )}
         {...props}

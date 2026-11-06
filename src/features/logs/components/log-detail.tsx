@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { LogEntry } from "@/types/logs";
-import { LEVEL_BADGES, formatLogTime } from "../options";
+import { LEVEL_BADGES, formatLogTime, statusDot } from "../options";
 
 export function LogDetail({
   entry,
@@ -34,7 +34,7 @@ export function LogDetail({
 
   return (
     <div className="flex min-h-0 flex-col">
-      <div className="bg-thead text-muted-foreground flex h-8 shrink-0 items-center border-b pr-1.5 pl-4 text-xs font-medium">
+      <div className="bg-thead text-muted-foreground flex h-[33px] shrink-0 items-center border-b pr-1.5 pl-4 text-xs font-medium">
         <span className="flex-1">로그 상세</span>
         <Button
           variant="ghost"
@@ -66,6 +66,32 @@ export function LogDetail({
           </dd>
           <dt className="text-muted-foreground">출처</dt>
           <dd className="break-all">{entry.source}</dd>
+          {entry.request && (
+            <>
+              <dt className="text-muted-foreground">상태</dt>
+              <dd className="flex items-center gap-1.5 font-mono text-xs leading-5">
+                <span
+                  className={cn(
+                    "size-1.5 rounded-full",
+                    statusDot(entry.request.status),
+                  )}
+                />
+                {entry.request.status}
+              </dd>
+              <dt className="text-muted-foreground">메서드</dt>
+              <dd className="font-mono text-xs leading-5">
+                {entry.request.method}
+              </dd>
+              <dt className="text-muted-foreground">경로</dt>
+              <dd className="font-mono text-xs leading-5 break-all">
+                {entry.request.path}
+              </dd>
+              <dt className="text-muted-foreground">소요</dt>
+              <dd className="tabular-nums">
+                {entry.request.durationMs.toLocaleString()}ms
+              </dd>
+            </>
+          )}
         </dl>
         <div className="flex flex-col gap-1.5">
           <span className="text-muted-foreground">메시지</span>

@@ -17,6 +17,13 @@ export const LEVEL_DOTS: Record<LogLevel, string> = {
   INFO: "bg-neutral-400",
 };
 
+export const statusDot = (status: number) =>
+  status >= 500
+    ? LEVEL_DOTS.ERROR
+    : status >= 400
+      ? LEVEL_DOTS.WARN
+      : LEVEL_DOTS.INFO;
+
 export const RANGES = [
   { minutes: 15, label: "최근 15분" },
   { minutes: 60, label: "최근 1시간" },

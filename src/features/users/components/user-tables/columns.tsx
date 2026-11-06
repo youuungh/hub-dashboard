@@ -89,7 +89,7 @@ export const columns: ColumnDef<User>[] = [
         {row.original.followingCount.toLocaleString()}
       </div>
     ),
-    meta: { label: "팔로잉", kind: "number" },
+    meta: { label: "팔로잉", kind: "number", mobileHidden: true },
   },
   {
     accessorKey: "postCount",
@@ -101,7 +101,7 @@ export const columns: ColumnDef<User>[] = [
         {row.original.postCount.toLocaleString()}
       </div>
     ),
-    meta: { label: "포스트", kind: "number" },
+    meta: { label: "포스트", kind: "number", mobileHidden: true },
   },
   {
     // 서버 정렬이 없어 정렬 끔, 일반 유저는 비어 있음
