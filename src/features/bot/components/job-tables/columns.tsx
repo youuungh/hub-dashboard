@@ -79,7 +79,7 @@ export const columns: ColumnDef<BotJob>[] = [
     meta: {
       label: "종류",
       kind: "badge",
-      width: 170,
+      width: 150,
       variant: "select",
       options: GROUP_OPTIONS,
     },
@@ -121,7 +121,7 @@ export const columns: ColumnDef<BotJob>[] = [
     meta: {
       label: "상태",
       kind: "badge",
-      width: 150,
+      width: 130,
       variant: "select",
       options: STATUS_OPTIONS,
     },

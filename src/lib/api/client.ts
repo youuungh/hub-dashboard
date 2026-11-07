@@ -46,8 +46,8 @@ async function rotateTokens(): Promise<string> {
 function redirectToLogin() {
   tokenStore.clear();
   if (!window.location.pathname.includes("/login")) {
-    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- axios 인터셉터(컴포넌트 밖)라 router 사용 불가
-    window.location.href = "/login";
+    // axios 인터셉터(컴포넌트 밖)라 router 사용 불가
+    window.location.replace("/login");
   }
 }
 

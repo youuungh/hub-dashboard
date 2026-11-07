@@ -1,6 +1,6 @@
 "use client";
 
-import { tokenStore } from "@/lib/token";
+import { getTokenPayload, tokenStore } from "@/lib/token";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Quicksand } from "next/font/google";
@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { ALLOWED_ROLES } from "@/components/auth-guard";
 import { HaloLogo } from "@/components/halo-logo";
 import { GridBackground } from "@/components/motion/grid-background";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [rememberEmail, setRememberEmail] = useState(false);
+  const [checked, setChecked] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -51,6 +53,16 @@ export default function LoginPage() {
       password: "",
     },
   });
+
+  // 이미 로그인돼 있으면 폼 없이 대시보드로
+  useEffect(() => {
+    const role = getTokenPayload()?.role;
+    if (role && ALLOWED_ROLES.includes(role)) {
+      router.replace("/dashboard/overview");
+      return;
+    }
+    setChecked(true);
+  }, [router]);
 
   useEffect(() => {
     const savedEmail = localStorage.getItem("rememberedEmail");
@@ -79,7 +91,7 @@ export default function LoginPage() {
 
       tokenStore.save(response.accessToken, response.refreshToken);
       toast.success("로그인 성공!");
-      router.push("/dashboard/overview");
+      router.replace("/dashboard/overview");
     } catch (error) {
       if (error instanceof AxiosError) {
         const message = error.response?.data?.error || "로그인에 실패했습니다.";
@@ -91,6 +103,8 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  if (!checked) return null;
 
   return (
     <div className="relative flex min-h-svh items-center justify-center overflow-hidden px-4 py-6">

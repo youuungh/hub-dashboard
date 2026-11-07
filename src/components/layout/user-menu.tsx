@@ -44,7 +44,7 @@ export function UserMenu() {
       // 다른 계정 로그인 때 이전 캐시가 안 보이게
       queryClient.clear();
       toast.success("로그아웃되었습니다");
-      router.push("/login");
+      router.replace("/login");
     } catch (error) {
       toast.error(getApiErrorMessage(error) || "로그아웃에 실패했습니다");
     } finally {

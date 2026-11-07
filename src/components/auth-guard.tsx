@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getTokenPayload, tokenStore } from "@/lib/token";
 
-const ALLOWED_ROLES = ["ADMIN", "CREATOR"];
+export const ALLOWED_ROLES = ["ADMIN", "CREATOR"];
 
 // 토큰·역할만 보는 UX 게이트, 실제 권한은 서버
 // 만료된 access는 통과, 첫 호출에서 회전
